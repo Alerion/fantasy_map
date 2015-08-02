@@ -40,8 +40,8 @@ class Command(BaseCommand):
         # FIXME: add smarter conversion
         max_x = max([float(node.get('x')) for node in centers.values()])
         max_y = max([float(node.get('y')) for node in centers.values()])
-        max_lat = 50.
-        max_lng = 50.
+        max_lat = 70.
+        max_lng = 70.
 
         for node in centers.values():
             obj = Biome(biome=node.get('biome'))
@@ -50,13 +50,13 @@ class Command(BaseCommand):
             obj.border = (node.get('border') == 'true')
             obj.elevation = float(node.get('elevation'))
             obj.moisture = float(node.get('moisture'))
-            obj.lat = float(node.get('y')) * max_lat / max_y
-            obj.lng = float(node.get('x')) * max_lng / max_x
+            obj.lat = float(node.get('y')) * max_lat / max_y - 25
+            obj.lng = float(node.get('x')) * max_lng / max_x - 25
             coords = []
             for cnode in node.xpath('corner'):
                 corner = corners[cnode.get('id')]
-                lat = float(corner.get('y')) * max_lat / max_y
-                lng = float(corner.get('x')) * max_lng / max_x
+                lat = float(corner.get('y')) * max_lat / max_y - 25
+                lng = float(corner.get('x')) * max_lng / max_x - 25
                 coords.append((lng, lat))
             # sort coordinates
             coords.sort(key=lambda p: math.atan2(p[1] - obj.lat, p[0] - obj.lng))

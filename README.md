@@ -1,5 +1,17 @@
 Map generator based on this [algo](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
 
+Run tiles erver:
+
+    $ gunicorn "TileStache:WSGITileServer('tilestache.json')"
+
+    or
+
+    $ tilestache-server.py -c tilestache.json
+
+Run web server:
+
+    $ ./manage.py runserver 127.0.0.1:8001
+
 # Installation
 
 Requires Python 2.7.

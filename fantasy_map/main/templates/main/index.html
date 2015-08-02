@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Quick Start Guide Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+
+<body>
+    <div id="map" style="width: 800px; height: 600px"></div>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+    <script>
+
+        var map = L.map('map', {
+            //maxBounds: L.latLngBounds([0, 0], [50, 50]),
+            //crs: L.CRS.EPSG4326
+        }).setView([0, 0], 2);
+
+        L.tileLayer('http://127.0.0.1:8080/map/{z}/{x}/{y}.png').addTo(map);
+
+        L.marker([0, 0]).addTo(map);
+    </script>
+</body>
+</html>
