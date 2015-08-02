@@ -1,0 +1,4 @@
+*.pyc
+env/
+local_settings.py
+*.sublime-*
