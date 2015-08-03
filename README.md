@@ -2,10 +2,6 @@ Map generator based on this [algo](http://www-cs-students.stanford.edu/~amitp/ga
 
 Run tiles erver:
 
-    $ gunicorn "TileStache:WSGITileServer('tilestache.json')"
-
-    or
-
     $ tilestache-server.py -c tilestache.json
 
 Run web server:

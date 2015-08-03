@@ -1,24 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Quick Start Guide Example</title>
+    <title>Fantasy Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
-
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 <body>
     <div id="map" style="width: 800px; height: 600px"></div>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
     <script>
-
-        var map = L.map('map', {
-            //maxBounds: L.latLngBounds([0, 0], [50, 50]),
-            //crs: L.CRS.EPSG4326
-        }).setView([0, 0], 2);
-
+        var biomesURL = '{% url "biomes_data" %}'
+        var map = L.map('map').setView([0, 0], 3);
         L.tileLayer('http://127.0.0.1:8080/map/{z}/{x}/{y}.png').addTo(map);
 
-        L.marker([0, 0]).addTo(map);
+        var myStyle = {
+            "color": "#888",
+            "weight": 1,
+            "opacity": 0.5
+        };
+
+        $.getJSON(biomesURL, function(data) {
+            L.geoJson(data, {
+                style: myStyle,
+                onEachFeature: function (feature, layer) {
+                    layer.bindPopup(feature.properties.biome, {maxWidth: 200});
+                }
+            }).addTo(map);
+        });
     </script>
 </body>
 </html>

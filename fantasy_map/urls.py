@@ -17,7 +17,10 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
+from fantasy_map.main import views
+
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="main/index.html")),
+    url(r'^biomes_data.json$', views.biomes_data, name="biomes_data"),
     url(r'^admin/', include(admin.site.urls)),
 ]

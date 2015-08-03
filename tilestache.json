@@ -14,7 +14,7 @@
             "provider": {
                 "name": "mapnik",
                 "mapfile": "/home/alerion/Workspace/fantasy_map/simple_world_style.xml"
-            },
+            }
         },
         "map": {
             "provider": {
