@@ -1,93 +1,161 @@
-<Map background-color="steelblue" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
+<Map background-color="#abceff" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
 
-  <Style name="biomes">
+  <Style name="heights" opacity="0.75">
     <Rule>
-      <PolygonSymbolizer fill="#a4c4a8" />
-      <LineSymbolizer stroke="#a4c4a8" stroke-width="1" />
+      <PolygonSymbolizer fill="#FFFFFF"/>
+      <LineSymbolizer stroke="#FFFFFF" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[biome] = 'SNOW' or [biome] = 'LAKE'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#FFFFFF"/>
+      <LineSymbolizer stroke="#FFFFFF" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &lt;= 0.1 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#F8F8F8" />
+      <LineSymbolizer stroke="#F8F8F8" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.1 and [elevation] &lt;= 0.2 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#F0F0F0" />
+      <LineSymbolizer stroke="#F0F0F0" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.2 and [elevation] &lt;= 0.3 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#E8E8E8" />
+      <LineSymbolizer stroke="#E8E8E8" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.3 and [elevation] &lt;= 0.4 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#E0E0E0" />
+      <LineSymbolizer stroke="#E0E0E0" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.4 and [elevation] &lt;= 0.5 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#D8D8D8" />
+      <LineSymbolizer stroke="#D8D8D8" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.5 and [elevation] &lt;= 0.6 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#D0D0D0" />
+      <LineSymbolizer stroke="#D0D0D0" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.6 and [elevation] &lt;= 0.7 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#C8C8C8" />
+      <LineSymbolizer stroke="#C8C8C8" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.7 and [elevation] &lt;= 0.8 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#C0C0C0" />
+      <LineSymbolizer stroke="#C0C0C0" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.8 and [elevation] &lt;= 0.9 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#B8B8B8" />
+      <LineSymbolizer stroke="#B8B8B8" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[elevation] &gt; 0.9 and not [biome] = 'LAKE' and not [biome] = 'SNOW'</Filter>
+    </Rule>
+  </Style>
+
+  <Style name="biomes" comp-op="multiply">
+    <Rule>
+      <PolygonSymbolizer fill="#a4c4a8"/>
+      <LineSymbolizer stroke="#a4c4a8" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'TEMPERATE_RAIN_FOREST'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#e4e8ca" />
-      <LineSymbolizer stroke="#e4e8ca" stroke-width="1" />
+      <LineSymbolizer stroke="#e4e8ca" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'TEMPERATE_DESERT'</Filter>
     </Rule>
 
     <Rule>
-      <PolygonSymbolizer fill="#f8f8f8" />
-      <LineSymbolizer stroke="#f8f8f8" stroke-width="1" />
+      <PolygonSymbolizer fill="#f0f0f0" />
+      <LineSymbolizer stroke="#f0f0f0" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'SNOW'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#e9ddc7" />
-      <LineSymbolizer stroke="#e9ddc7" stroke-width="1" />
+      <LineSymbolizer stroke="#e9ddc7" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'SUBTROPICAL_DESERT'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#b4c9a9" />
-      <LineSymbolizer stroke="#b4c9a9" stroke-width="1" />
+      <LineSymbolizer stroke="#b4c9a9" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'TEMPERATE_DECIDUOUS_FOREST'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#ccd4bb" />
-      <LineSymbolizer stroke="#ccd4bb" stroke-width="1" />
+      <LineSymbolizer stroke="#ccd4bb" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'TAIGA'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#9cbba9" />
-      <LineSymbolizer stroke="#9cbba9" stroke-width="1" />
+      <LineSymbolizer stroke="#9cbba9" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'TROPICAL_RAIN_FOREST'</Filter>
     </Rule>
 
     <Rule>
-      <PolygonSymbolizer fill="#2464ab" />
-      <LineSymbolizer stroke="#2464ab" stroke-width="1" />
+      <PolygonSymbolizer fill="#abceff" />
+      <LineSymbolizer stroke="#abceff" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'LAKE'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#bbbbbb" />
-      <LineSymbolizer stroke="#bbbbbb" stroke-width="1" />
+      <LineSymbolizer stroke="#bbbbbb" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'BARE'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#999999" />
-      <LineSymbolizer stroke="#999999" stroke-width="1" />
+      <LineSymbolizer stroke="#999999" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'TUNDRA'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#c4d4aa" />
-      <LineSymbolizer stroke="#c4d4aa" stroke-width="1" />
+      <LineSymbolizer stroke="#c4d4aa" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'GRASSLAND'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#a9cca4" />
-      <LineSymbolizer stroke="#a9cca4" stroke-width="1" />
+      <LineSymbolizer stroke="#a9cca4" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'TROPICAL_SEASONAL_FOREST'</Filter>
     </Rule>
 
     <Rule>
       <PolygonSymbolizer fill="#c4ccbb" />
-      <LineSymbolizer stroke="#c4ccbb" stroke-width="1" />
+      <LineSymbolizer stroke="#c4ccbb" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'SHRUBLAND'</Filter>
     </Rule>
 
     <Rule>
-      <PolygonSymbolizer fill="#ac9f8b" />
-      <LineSymbolizer stroke="#ac9f8b" stroke-width="1" />
+      <PolygonSymbolizer fill="#c1b5a2" />
+      <LineSymbolizer stroke="#c1b5a2" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'BEACH'</Filter>
     </Rule>
   </Style>
 
-  <Layer name="world" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
-    <StyleName>biomes</StyleName>
+  <Layer name="world" status="on" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>heights</StyleName>
     <Datasource>
       <Parameter name="type">postgis</Parameter>
       <Parameter name="host">localhost</Parameter>
@@ -98,4 +166,15 @@
     </Datasource>
   </Layer>
 
+  <Layer name="world" status="on" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>biomes</StyleName>
+    <Datasource>
+      <Parameter name="type">postgis</Parameter>
+      <Parameter name="host">localhost</Parameter>
+      <Parameter name="user">alerion</Parameter>
+      <Parameter name="password">alerion</Parameter>
+      <Parameter name="dbname">fantasy_map</Parameter>
+      <Parameter name="table">main_biome</Parameter>
+    </Datasource>
+  </Layer>
 </Map>
