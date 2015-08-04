@@ -1,6 +1,6 @@
 <Map background-color="#abceff" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
 
-  <Style name="heights" opacity="0.75">
+  <Style name="heights">
     <Rule>
       <PolygonSymbolizer fill="#FFFFFF"/>
       <LineSymbolizer stroke="#FFFFFF" stroke-width="1"  stroke-linejoin="round"/>
@@ -82,14 +82,14 @@
     </Rule>
 
     <Rule>
-      <PolygonSymbolizer fill="#f0f0f0" />
-      <LineSymbolizer stroke="#f0f0f0" stroke-width="1"  stroke-linejoin="round"/>
+      <PolygonSymbolizer fill="#fff" />
+      <LineSymbolizer stroke="#fff" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'SNOW'</Filter>
     </Rule>
 
     <Rule>
-      <PolygonSymbolizer fill="#e9ddc7" />
-      <LineSymbolizer stroke="#e9ddc7" stroke-width="1"  stroke-linejoin="round"/>
+      <PolygonSymbolizer fill="#c1b5a2" />
+      <LineSymbolizer stroke="#c1b5a2" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'SUBTROPICAL_DESERT'</Filter>
     </Rule>
 
@@ -148,8 +148,8 @@
     </Rule>
 
     <Rule>
-      <PolygonSymbolizer fill="#c1b5a2" />
-      <LineSymbolizer stroke="#c1b5a2" stroke-width="1"  stroke-linejoin="round"/>
+      <PolygonSymbolizer fill="#e9ddc7" />
+      <LineSymbolizer stroke="#e9ddc7" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'BEACH'</Filter>
     </Rule>
   </Style>

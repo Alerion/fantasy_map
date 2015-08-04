@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'fantasy_map.main',
+    'fantasy_map.map',
 )
 
 MIDDLEWARE_CLASSES = (
