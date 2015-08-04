@@ -22,14 +22,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         points = np.random.random((6, 2))
-
         plt.figure(figsize=(10, 10))
         ax = plt.subplot(1, 1, 1)
+
+        for point in points:
+            ax.plot([point[0]], [point[1]], 'o')
 
         vor = Voronoi(points)
         voronoi_plot_2d(vor)
 
-        # regions, vertices = voronoi_finite_polygons_2d(vor)
+        # vertices, regions = voronoi_finite_polygons_2d(vor)
         # for region in regions:
         #     polygon = vertices[region]
         #     p = matplotlib.patches.Polygon(polygon, facecolor=(1, 1, 1))
@@ -37,9 +39,38 @@ class Command(BaseCommand):
 
         ax.plot(points[:, 0], points[:, 1], '.')
 
-        for poly in polygons(points):
-            p = matplotlib.patches.Polygon(poly, facecolor=(1, 1, 1))
+        centers, edges, corners = polygons(points)
+
+        for center in centers:
+            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=(1, 1, 1))
             ax.add_patch(p)
+
+            # for edge in center.borders:
+            #     ax.plot(
+            #         [center.point[0], edge.midpoint[0]],
+            #         [center.point[1], edge.midpoint[1]],
+            #         'k--')
+
+            # for neigh in center.neighbors:
+            #     ax.plot(
+            #         [center.point[0], neigh.point[0]],
+            #         [center.point[1], neigh.point[1]],
+            #         'k:')
+
+        for corner in corners:
+            ax.plot([corner.point[0]], [corner.point[1]], '.')
+
+        # for edge in edges:
+        #     ax.plot(
+        #         [edge.corners[0].point[0], edge.corners[1].point[0]],
+        #         [edge.corners[0].point[1], edge.corners[1].point[1]],
+        #         'k-')
+
+        #     if len(edge.centers) == 2:
+        #         ax.plot(
+        #             [edge.centers[0].point[0], edge.centers[1].point[0]],
+        #             [edge.centers[0].point[1], edge.centers[1].point[1]],
+        #             'k--')
 
         plt.axis([-0.05, 1.05, -0.05, 1.05])
         plt.show()
@@ -126,7 +157,7 @@ def voronoi_finite_polygons_2d(vor, radius=None):
         # finish
         new_regions.append(new_region.tolist())
 
-    return new_regions, np.asarray(new_vertices)
+    return np.asarray(new_vertices), new_regions
 
 
 def voronoi(points):
@@ -276,12 +307,23 @@ def polygons(points):
     :param points: shape (n, 2)
     :rtype: list of n polygons where each polygon is an array of vertices
     '''
+    vertices, regions = voronoi_finite_polygons_2d(Voronoi(points))
+
+
     # get vertices and edge indices
-    vertices, edge_indices = voronoi(points)
+    # vertices, edge_indices = voronoi(points)
     # get mapping point index -> list of edges
-    cells = voronoi_cell_lines(points, vertices, edge_indices)
+    #cells = voronoi_cell_lines(points, vertices, edge_indices)
+    cells = []
+    for region in regions:
+        edges = []
+        for i in range(len(region) - 1):
+            edges.append((region[i], region[i + 1]))
+        edges.append((region[-1], region[0]))
+        cells.append(edges)
+
     # get mapping point index -> list of corners
-    polys = voronoi_polygons(cells)
+    # polys = voronoi_polygons(cells)
 
     centers = {}
     corners = {}
@@ -295,7 +337,7 @@ def polygons(points):
         corner = Corner(index, vertice)
         corners[key(vertice)] = corner
 
-    for point_index, edge_indices in cells.items():
+    for point_index, edge_indices in enumerate(cells):
         point = points[point_index]
         center = centers[key(point)]
 
@@ -316,7 +358,7 @@ def polygons(points):
             center.borders.append(edge)
             edge.centers.append(center)
 
-    for point_index, vertice_indeces in polys.items():
+    for point_index, vertice_indeces in enumerate(regions):
         point = points[point_index]
         center = centers[key(point)]
 
@@ -334,10 +376,7 @@ def polygons(points):
             edge.centers[0].neighbors.append(edge.centers[1])
             edge.centers[1].neighbors.append(edge.centers[0])
 
-    polylist = []
-    for center in centers.values():
-        polylist.append([c.point for c in center.corners])
-    return polylist
+    return centers.values(), edges.values(), corners.values()
 
 
 class Center(object):
@@ -367,4 +406,8 @@ class Edge(object):
     def __init__(self, index, corners):
         self.index = index
         self.corners = corners  # 2-tuple of Corner
+        self.midpoint = [
+            (corners[0].point[0] + corners[1].point[0]) / 2,
+            (corners[0].point[1] + corners[1].point[1]) / 2,
+        ]
         self.centers = []  # 2-list of Center
