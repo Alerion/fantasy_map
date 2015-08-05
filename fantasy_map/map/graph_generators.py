@@ -1,5 +1,5 @@
 from .graph import Center, Edge, Corner
-from .voronoi import voronoi_finite_polygons_2d
+from .voronoi import voronoi_finite_polygons
 
 
 def key(p1, p2=None):
@@ -12,29 +12,28 @@ class VoronoiGraph(object):
 
     def __call__(self, map_obj):
         points = map_obj.points
-        vertices, regions = voronoi_finite_polygons_2d(points)
-
-        cells = []
-        for region in regions:
-            edges = []
-            for i in range(len(region) - 1):
-                edges.append((region[i], region[i + 1]))
-            edges.append((region[-1], region[0]))
-            cells.append(edges)
+        regions = voronoi_finite_polygons(points, bbox=map_obj.bbox)
 
         centers = {}
         corners = {}
         edges = {}
 
-        for index, point in enumerate(points):
-            center = Center(index, point)
-            centers[key(point)] = center
+        for point in points:
+            centers[key(point)] = Center(point)
 
-        for index, vertice in enumerate(vertices):
-            corner = Corner(index, vertice)
-            corners[key(vertice)] = corner
+        region_edges = []
+        for region in regions:
+            cell_edges = []
+            for i in range(len(region) - 1):
+                cell_edges.append((region[i], region[i + 1]))
 
-        for point_index, cell_edges in enumerate(cells):
+            region_edges.append(cell_edges)
+
+            for vertice in region:
+                if key(vertice) not in corners:
+                    corners[key(vertice)] = Corner(vertice)
+
+        for point_index, cell_edges in enumerate(region_edges):
             point = points[point_index]
             center = centers[key(point)]
 
@@ -42,7 +41,7 @@ class VoronoiGraph(object):
                 if key(p1, p2) not in edges:
                     corner1 = corners[key(p1)]
                     corner2 = corners[key(p2)]
-                    edge = Edge(index, (corner1, corner2))
+                    edge = Edge((corner1, corner2))
                     corner1.protrudes.append(edge)
                     corner2.protrudes.append(edge)
                     corner1.adjacent.append(corner1)

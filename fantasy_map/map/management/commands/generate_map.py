@@ -19,10 +19,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         map_obj = Map(100500, [
-            #points_generators.RandomPoints(points_number=50),
-            points_generators.RelaxedPoints(points_number=10, lloyd_iterations=0),
+            points_generators.RelaxedPoints(points_number=100),
             graph_generators.VoronoiGraph(),
-            renderers.MatplotRenderer().render_edges
+            renderers.MatplotRenderer().render_centers,
         ])
 
         map_obj.generate()

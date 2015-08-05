@@ -8,6 +8,7 @@ class Map(object):
         self.generators = generators
         np.random.seed(seed)
 
+        self.bbox = [(0, 0), (1, 0), (1, 1), (0, 1)]
         self.points = []  # used just for graph generator
         self.centers = []
         self.edges = []

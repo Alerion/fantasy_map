@@ -1,7 +1,6 @@
-from scipy.spatial import Voronoi
 import numpy as np
 
-from .voronoi import voronoi_finite_polygons_2d
+from .voronoi import voronoi_finite_polygons
 
 
 class RandomPoints(object):
@@ -26,9 +25,9 @@ class RelaxedPoints(object):
         points = np.random.random((self.points_number, 2))
 
         for _ in range(self.lloyd_iterations):
-            _, regions = voronoi_finite_polygons_2d(points)
+            regions = voronoi_finite_polygons(points, bbox=map_obj.bbox)
             points = []
             for region in regions:
-                points.append(region.mean(axis=0))
+                points.append(region.mean(axis=0))  # get centroid
 
         map_obj.points = points

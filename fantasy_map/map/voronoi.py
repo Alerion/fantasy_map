@@ -1,13 +1,14 @@
 from scipy.spatial import Voronoi
+from shapely.geometry import Polygon
 import numpy as np
 
 
-def voronoi_finite_polygons_2d(points, radius=None):
+def voronoi_finite_polygons(points, radius=None, bbox=None):
     """
     Reconstruct infinite voronoi regions in a 2D diagram to finite
     regions.
 
-    From here: https://stackoverflow.com/questions/20515554/colorize-voronoi-diagram/20678647
+    Based on https://stackoverflow.com/questions/20515554/colorize-voronoi-diagram/20678647
 
     Parameters
     ----------
@@ -15,6 +16,7 @@ def voronoi_finite_polygons_2d(points, radius=None):
         Input diagram
     radius : float, optional
         Distance to 'points at infinity'.
+    bbox : Cut polygons to bounds
 
     Returns
     -------
@@ -88,4 +90,12 @@ def voronoi_finite_polygons_2d(points, radius=None):
             np.asarray([new_vertices[p] for p in region])
         )
 
-    return np.asarray(new_vertices), regions
+    if bbox:
+        bbox = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+        new_regions = []
+        for region in regions:
+            poly = Polygon(region).intersection(bbox).exterior.coords
+            new_regions.append(np.asarray(poly))
+        regions = new_regions
+
+    return regions

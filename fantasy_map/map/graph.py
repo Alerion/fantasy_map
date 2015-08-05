@@ -1,7 +1,6 @@
 class Center(object):
 
-    def __init__(self, index, point):
-        self.index = index
+    def __init__(self, point):
         self.point = point
         self.neighbors = []  # list of Center
         self.borders = []  # list of Edge
@@ -12,8 +11,7 @@ class Center(object):
 
 class Corner(object):
 
-    def __init__(self, index, point):
-        self.index = index
+    def __init__(self, point):
         self.point = point
         self.touches = []  # list of Center
         self.protrudes = []  # list of Edge
@@ -22,8 +20,7 @@ class Corner(object):
 
 class Edge(object):
 
-    def __init__(self, index, corners):
-        self.index = index
+    def __init__(self, corners):
         self.corners = corners  # 2-tuple of Corner
         self.midpoint = [
             (corners[0].point[0] + corners[1].point[0]) / 2,
