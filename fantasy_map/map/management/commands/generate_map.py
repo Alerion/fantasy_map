@@ -8,18 +8,21 @@ from __future__ import division
 
 from django.core.management.base import BaseCommand
 
+from fantasy_map.map import graph_generators
+from fantasy_map.map import points_generators
+from fantasy_map.map import renderers
 from fantasy_map.map.map import Map
-from fantasy_map.map.graph_generators import VoronoiGenerator
-from fantasy_map.map.renderers import MatplotRenderer
 
 
 class Command(BaseCommand):
     help = 'Generate new map'
 
     def handle(self, *args, **options):
-        map_obj = Map([
-            VoronoiGenerator(points_number=50),
-            MatplotRenderer().render_centers
+        map_obj = Map(100500, [
+            #points_generators.RandomPoints(points_number=50),
+            points_generators.RelaxedPoints(points_number=10, lloyd_iterations=0),
+            graph_generators.VoronoiGraph(),
+            renderers.MatplotRenderer().render_edges
         ])
 
         map_obj.generate()
