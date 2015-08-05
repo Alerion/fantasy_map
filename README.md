@@ -1,33 +1,21 @@
-Map generator based on this [algo](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
+Map generator based on this [article](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
 
-Run tiles erver:
+## Usage
 
-    $ tilestache-server.py -c tilestache.json
-
-Run web server:
-
-    $ ./manage.py runserver 127.0.0.1:8001
+See Makefile
 
 # Installation
 
 Requires Python 2.7.
 
-Create virtualenv with --system-site-packages, it is problem to install mapnik into virtualenv.
+Create virtualenv with --system-site-packages(it is problem to install mapnik into virtualenv).
 
     $ virtualenv-2.7 --system-site-packages env
 
 ## Install mapnik
 
-From here: https://github.com/mapnik/mapnik/wiki/UbuntuInstallation:
+Follow this https://github.com/mapnik/mapnik/wiki/UbuntuInstallation. Tested with mapnik 2.3
 
-    sudo add-apt-repository ppa:mapnik/nightly-2.3
-    sudo apt-get update
-    sudo apt-get install libmapnik libmapnik-dev mapnik-utils python-mapnik
-    # also install datasource plugins if you need them
-    sudo apt-get install mapnik-input-plugin-gdal mapnik-input-plugin-ogr\
-      mapnik-input-plugin-postgis \
-      mapnik-input-plugin-sqlite \
-      mapnik-input-plugin-osm
 
 ## Install PostgreSQL
 
@@ -59,9 +47,3 @@ https://docs.djangoproject.com/en/1.8/ref/contrib/gis/install/
 
     $ ./manage.py migrate
     $ ./manage.py import_map
-
-## Usage
-
-Generate tiles:
-
-    $ ./manage.py create_tiles

@@ -11,7 +11,7 @@ world_shp = os.path.abspath(os.path.join(settings.BASE_DIR, 'map/ne_110m_admin_0
 
 
 class Command(BaseCommand):
-    help = 'Import counties to DB'
+    help = 'Import counties to DB. They may be useful for debugging.'
 
     def handle(self, *args, **options):
         lm = LayerMapping(Country, world_shp, country_mapping,

@@ -2,3 +2,4 @@
 env/
 local_settings.py
 *.sublime-*
+world.png
