@@ -17,6 +17,8 @@ class Corner(object):
         self.protrudes = []  # list of Edge
         self.adjacent = []  # list of Corner
 
+        self.border = False
+
 
 class Edge(object):
 

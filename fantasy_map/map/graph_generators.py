@@ -10,7 +10,7 @@ def key(p1, p2=None):
 
 class VoronoiGraph(object):
 
-    def __call__(self, map_obj):
+    def generate_graph(self, map_obj):
         points = map_obj.points
         regions = voronoi_finite_polygons(points, bbox=map_obj.bbox)
 
@@ -31,7 +31,11 @@ class VoronoiGraph(object):
 
             for vertice in region:
                 if key(vertice) not in corners:
-                    corners[key(vertice)] = Corner(vertice)
+                    corner = Corner(vertice)
+                    corner.border = (
+                        vertice[0] == 0 or vertice[1] == 1 or vertice[1] == 0 or vertice[1] == 1
+                    )
+                    corners[key(vertice)] = corner
 
         for point_index, cell_edges in enumerate(region_edges):
             point = points[point_index]

@@ -19,8 +19,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         map_obj = Map(100500, [
-            points_generators.RelaxedPoints(points_number=100),
-            graph_generators.VoronoiGraph(),
+            points_generators.RelaxedPoints(points_number=100).generate_points,
+            graph_generators.VoronoiGraph().generate_graph,
+            # TODO: add this https://github.com/amitp/mapgen2/blob/master/Map.as#L215
             renderers.MatplotRenderer().render_centers,
         ])
 

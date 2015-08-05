@@ -8,7 +8,7 @@ class RandomPoints(object):
     def __init__(self, points_number):
         self.points_number = points_number
 
-    def __call__(self, map_obj):
+    def generate_points(self, map_obj):
         map_obj.points = np.random.random((self.points_number, 2))
 
 
@@ -21,7 +21,7 @@ class RelaxedPoints(object):
         self.points_number = points_number
         self.lloyd_iterations = lloyd_iterations
 
-    def __call__(self, map_obj):
+    def generate_points(self, map_obj):
         points = np.random.random((self.points_number, 2))
 
         for _ in range(self.lloyd_iterations):
