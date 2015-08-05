@@ -5,3 +5,4 @@ TileStache
 numpy
 scipy
 shapely
+noise

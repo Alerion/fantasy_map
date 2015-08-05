@@ -12,6 +12,9 @@ class Center(object):
         self.corners = []  # list of Corner
 
         self.border = False  # at the edge of the map
+        self.water = False  # lake or ocean
+        self.ocean = False  # ocean
+        self.coast = False  # land polygon touching an ocean
 
 
 class Corner(object):
@@ -23,6 +26,9 @@ class Corner(object):
         self.adjacent = []  # list of Corner
 
         self.border = False  # at the edge of the map
+        self.water = False  # lake or ocean
+        self.ocean = False  # all touches are ocean
+        self.coast = False  # touches ocean and land polygons
 
 
 class Edge(object):
