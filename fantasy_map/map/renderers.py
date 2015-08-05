@@ -15,7 +15,10 @@ class MatplotRenderer(object):
 
     def render_centers(self, map_obj):
         for center in map_obj.centers:
-            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=(1, 1, 1))
+            facecolor = (1, 1, 1)
+            if center.border:
+                facecolor = (0.8, 0.8, 0.8)
+            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
 
             if self.verbose:
@@ -34,17 +37,25 @@ class MatplotRenderer(object):
         plt.show()
 
     def render_corners(self, map_obj):
-        for corner in map_obj.corners:
-            self.ax.plot([corner.point[0]], [corner.point[1]], '.')
+        x = [corner.point[0] for corner in map_obj.corners if not corner.border]
+        y = [corner.point[1] for corner in map_obj.corners if not corner.border]
+        self.ax.plot(x, y, '.')
+
+        x = [corner.point[0] for corner in map_obj.corners if corner.border]
+        y = [corner.point[1] for corner in map_obj.corners if corner.border]
+        self.ax.plot(x, y, 'o')
 
         plt.show()
 
     def render_edges(self, map_obj):
         for edge in map_obj.edges:
+            style = 'k-'
+            if edge.border:
+                style = 'g--'
             self.ax.plot(
                 [edge.corners[0].point[0], edge.corners[1].point[0]],
                 [edge.corners[0].point[1], edge.corners[1].point[1]],
-                'k-')
+                style)
 
             if self.verbose:
                 for center in edge.centers:

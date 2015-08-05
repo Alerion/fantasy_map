@@ -33,7 +33,7 @@ class VoronoiGraph(object):
                 if key(vertice) not in corners:
                     corner = Corner(vertice)
                     corner.border = (
-                        vertice[0] == 0 or vertice[1] == 1 or vertice[1] == 0 or vertice[1] == 1
+                        vertice[0] == 0 or vertice[0] == 1 or vertice[1] == 0 or vertice[1] == 1
                     )
                     corners[key(vertice)] = corner
 
@@ -50,6 +50,7 @@ class VoronoiGraph(object):
                     corner2.protrudes.append(edge)
                     corner1.adjacent.append(corner1)
                     corner2.adjacent.append(corner2)
+                    edge.border = corner1.border and corner2.border
                     edges[key(p1, p2)] = edge
                 else:
                     edge = edges[key(p1, p2)]
