@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand
 
 from fantasy_map.map import (
     graph_generators, points_generators, renderers, land_generators, elevation_generators,
-    river_generators
+    river_generators, biome_generators
 )
 from fantasy_map.map.map import Map
 
@@ -27,7 +27,8 @@ class Command(BaseCommand):
             land_generators.SimplexIsland().generate,
             elevation_generators.FromCoast().generate,
             river_generators.RandomRiver().generate,
-            renderers.ElevationRenderer().render,
+            biome_generators.Moisture().generate,
+            renderers.MoistureRenderer().render,
             # renderers.LandRendered().render
             # renderers.GraphRenderer().render_corners
         ])

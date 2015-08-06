@@ -7,7 +7,8 @@ import math
 class FromCoast(object):
 
     def generate(self, map_obj):
-        # By default elevation is 0. ocean and cost corners have 0 elevation.
+        # FIXME: Lakes can be not just on 0 elevation, and rivers can flow from lake to ocean
+        # By default elevation is 0. water corners have 0 elevation.
         corners_queue = []
         for corner in map_obj.corners:
             if corner.coast or (corner.water and not corner.ocean):

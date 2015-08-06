@@ -1,6 +1,8 @@
 """
 For visual debugging.
 """
+from __future__ import division
+
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -149,5 +151,37 @@ class ElevationRenderer(MatplotRenderer):
                     [edge.corners[0].point[0], edge.corners[1].point[0]],
                     [edge.corners[0].point[1], edge.corners[1].point[1]],
                     '-', color='#1b6ee3', linewidth=edge.river)
+
+        plt.show()
+
+
+class MoistureRenderer(MatplotRenderer):
+
+    def render(self, map_obj):
+        for corner in map_obj.corners:
+            col = 1 - corner.moisture
+            markerfacecolor = (col, col, col)
+            self.ax.plot([corner.point[0]], [corner.point[1]], 'o', markerfacecolor=markerfacecolor)
+
+        for center in map_obj.centers:
+            if center.water:
+                facecolor = '#1b6ee3'
+                if center.ocean:
+                    facecolor = '#abceff'
+            else:
+                col = 0.2 + (1 - center.elevation) * 0.8
+                facecolor = (col, col, col)
+
+            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
+            self.ax.add_patch(p)
+
+        for edge in map_obj.edges:
+            if not edge.river:
+                continue
+
+            self.ax.plot(
+                [edge.corners[0].point[0], edge.corners[1].point[0]],
+                [edge.corners[0].point[1], edge.corners[1].point[1]],
+                '-', color='#1b6ee3', linewidth=edge.river)
 
         plt.show()
