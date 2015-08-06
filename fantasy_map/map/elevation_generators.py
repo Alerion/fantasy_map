@@ -1,5 +1,6 @@
 from __future__ import division
 
+import math
 # TODO: Add some algorithm to have ridges
 
 
@@ -39,7 +40,7 @@ class FromCoast(object):
         Copied from https://github.com/amitp/mapgen2/blob/master/Map.as#L466
         """
         # SCALE_FACTOR increases the mountain area. At 1.0 the maximum
-        # levation barely shows up on the map, so you can set it to 1.1.
+        # elevation barely shows up on the map, so you can set it to 1.1.
         SCALE_FACTOR = 1.1
         corners.sort(key=lambda c: c.elevation)
 
@@ -48,6 +49,12 @@ class FromCoast(object):
             # We want the higher elevations to occur less than lower
             # ones, and set the area to be y(x) = 1 - (1-x)^2.
             y = i / (len(corners) - 1)
-            corner.elevation = SCALE_FACTOR**2 - (SCALE_FACTOR * (1 - y))**2
+            # Now we have to solve for x, given the known y.
+            #   y = 1 - (1-x)^2
+            #   y = 1 - (1 - 2x + x^2)
+            #   y = 2x - x^2
+            #   x^2 - 2x + y = 0
+            # From this we can use the quadratic equation to get:
+            corner.elevation = math.sqrt(SCALE_FACTOR) - math.sqrt(SCALE_FACTOR * (1 - y))
             if corner.elevation > 1:
                 corner.elevation = 1.
