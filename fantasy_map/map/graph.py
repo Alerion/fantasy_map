@@ -15,6 +15,7 @@ class Center(object):
         self.water = False  # lake or ocean
         self.ocean = False  # ocean
         self.coast = False  # land polygon touching an ocean
+        self.elevation = 0  # 0.0 - 1.0. average of corners elevations
 
 
 class Corner(object):
@@ -29,6 +30,7 @@ class Corner(object):
         self.water = False  # lake or ocean
         self.ocean = False  # all touches are ocean
         self.coast = False  # touches ocean and land polygons
+        self.elevation = 0  # 0.0 - 1.0
 
 
 class Edge(object):

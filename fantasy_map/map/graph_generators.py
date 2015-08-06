@@ -48,8 +48,8 @@ class VoronoiGraph(object):
                     edge = Edge((corner1, corner2))
                     corner1.protrudes.append(edge)
                     corner2.protrudes.append(edge)
-                    corner1.adjacent.append(corner1)
-                    corner2.adjacent.append(corner2)
+                    corner1.adjacent.append(corner2)
+                    corner2.adjacent.append(corner1)
                     edge.border = corner1.border and corner2.border
                     edges[key(p1, p2)] = edge
                 else:

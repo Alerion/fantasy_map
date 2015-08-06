@@ -1,18 +1,19 @@
 from __future__ import division
 
-from noise import pnoise2, snoise2
-from pprint import pprint
+from noise import snoise2
 
+# TODO: add generator with Perlin noise, noise.pnoise2
 LAKE_THRESHOLD = 0.35  # 0 to 1, fraction of water corners for water polygon
 
 
-class PerlinIsland(object):
+class SimplexIsland(object):
     """
     Generate lands with Perlin noise.
     """
 
-    def __init__(self, octaves=8):
+    def __init__(self, octaves=8, land_threshold=0):
         self.octaves = octaves
+        self.land_threshold = land_threshold
 
     def generate_land(self, map_obj):
         # assign water for corners according to Perlin noise
@@ -22,9 +23,8 @@ class PerlinIsland(object):
                 corner.ocean = True
             else:
                 p = corner.point
-                # TODO: play around with this parameters, try snoise2
-                # now there is no lakes
-                corner.water = pnoise2(p[0], p[1], self.octaves) >= 0
+                val = snoise2(p[0], p[1], self.octaves, base=map_obj.seed)
+                corner.water = val < self.land_threshold
 
         ocean_polys = []
         for center in map_obj.centers:
@@ -59,5 +59,11 @@ class PerlinIsland(object):
         # fill corner.coast and corner.ocean
         for corner in map_obj.corners:
             if corner.water:
-                corner.ocean = all(neigh.ocean for neigh in corner.touches)
-                corner.coast = not corner.ocean
+                corner.ocean = any(neigh.ocean for neigh in corner.touches)
+
+                if corner.ocean:
+                    corner.coast = any(not neigh.water for neigh in corner.touches)
+
+                # fix noise "artifacts"
+                if all(not neigh.water for neigh in corner.touches):
+                    corner.water = False

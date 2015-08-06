@@ -48,6 +48,13 @@ class GraphRenderer(MatplotRenderer):
         y = [corner.point[1] for corner in map_obj.corners if corner.border]
         self.ax.plot(x, y, 'b.')
 
+        for corner in map_obj.corners:
+            for neigh in corner.adjacent:
+                self.ax.plot(
+                    [corner.point[0], neigh.point[0]],
+                    [corner.point[1], neigh.point[1]],
+                    'k:')
+
         plt.show()
 
     def render_edges(self, map_obj):
@@ -102,5 +109,27 @@ class LandRendered(MatplotRenderer):
         x = [corner.point[0] for corner in map_obj.corners if corner.coast]
         y = [corner.point[1] for corner in map_obj.corners if corner.coast]
         self.ax.plot(x, y, 'o', markerfacecolor='#f0f5ea')
+
+        plt.show()
+
+
+class ElevationRenderer(MatplotRenderer):
+
+    def render(self, map_obj):
+        for corner in map_obj.corners:
+            col = 1 - corner.elevation
+            self.ax.plot([corner.point[0]], [corner.point[1]], 'o', markerfacecolor=(col, col, col))
+
+        for center in map_obj.centers:
+            if center.water:
+                facecolor = '#1b6ee3'
+                if center.ocean:
+                    facecolor = '#abceff'
+            else:
+                col = 0.2 + (1 - center.elevation) * 0.8
+                facecolor = (col, col, col)
+
+            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
+            self.ax.add_patch(p)
 
         plt.show()

@@ -1,4 +1,4 @@
-Map generator based on this [article](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
+Map generator based on this [article](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/).
 
 ## Usage
 

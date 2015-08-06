@@ -19,3 +19,7 @@ class Map(object):
         # Not sure this is the best pattern
         for generator in self.generators:
             generator(self)
+
+    @property
+    def land_corners(self):
+        return [corner for corner in self.corners if not corner.water]
