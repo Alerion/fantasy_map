@@ -4,6 +4,9 @@ Map generator based on this [article](http://www-cs-students.stanford.edu/~amitp
 
 See Makefile
 
+It is is not necessary to install Mapnik, PostgreSQL and other staff to work with generator.
+You can run `make generate_map` and see result in matplotlib chart.
+
 # Installation
 
 Requires Python 2.7.
@@ -15,7 +18,6 @@ Create virtualenv with --system-site-packages(it is problem to install mapnik in
 ## Install mapnik
 
 Follow this https://github.com/mapnik/mapnik/wiki/UbuntuInstallation. Tested with mapnik 2.3
-
 
 ## Install PostgreSQL
 
