@@ -10,7 +10,7 @@ def key(p1, p2=None):
 
 class VoronoiGraph(object):
 
-    def generate_graph(self, map_obj):
+    def generate(self, map_obj):
         points = map_obj.points
         regions = voronoi_finite_polygons(points, bbox=map_obj.bbox)
 

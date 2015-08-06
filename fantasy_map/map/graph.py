@@ -32,6 +32,10 @@ class Corner(object):
         self.coast = False  # touches ocean and land polygons
         self.elevation = 0  # 0.0 - 1.0
 
+        self.river = 0  # 0 if no river, or volume of water in river
+        self.downslope = None  # Corner, pointer to adjacent corner most downhill
+        self.downslope_edge = None  # Edge between this Corner and downslope
+
 
 class Edge(object):
 
@@ -44,3 +48,4 @@ class Edge(object):
         ]
 
         self.border = False  # at the edge of the map
+        self.river = 0  # 0 if no river, or volume of water in river

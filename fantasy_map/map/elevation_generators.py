@@ -6,7 +6,7 @@ import math
 
 class FromCoast(object):
 
-    def generate_elevation(self, map_obj):
+    def generate(self, map_obj):
         # By default elevation is 0. ocean and cost corners have 0 elevation.
         corners_queue = []
         for corner in map_obj.corners:

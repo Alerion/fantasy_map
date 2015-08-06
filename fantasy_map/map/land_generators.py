@@ -15,7 +15,7 @@ class SimplexIsland(object):
         self.octaves = octaves
         self.land_threshold = land_threshold
 
-    def generate_land(self, map_obj):
+    def generate(self, map_obj):
         # assign water for corners according to Perlin noise
         for corner in map_obj.corners:
             if corner.border:

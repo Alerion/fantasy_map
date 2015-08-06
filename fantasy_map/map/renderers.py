@@ -115,10 +115,18 @@ class LandRendered(MatplotRenderer):
 
 class ElevationRenderer(MatplotRenderer):
 
+    def __init__(self, verbose=False, rivers=True):
+        self.rivers = rivers
+        super(ElevationRenderer, self).__init__(verbose)
+
     def render(self, map_obj):
         for corner in map_obj.corners:
-            col = 1 - corner.elevation
-            self.ax.plot([corner.point[0]], [corner.point[1]], 'o', markerfacecolor=(col, col, col))
+            if self.rivers and corner.river:
+                markerfacecolor = '#1b6ee3'
+            else:
+                col = 1 - corner.elevation
+                markerfacecolor = (col, col, col)
+            self.ax.plot([corner.point[0]], [corner.point[1]], 'o', markerfacecolor=markerfacecolor)
 
         for center in map_obj.centers:
             if center.water:
@@ -131,5 +139,15 @@ class ElevationRenderer(MatplotRenderer):
 
             p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
+
+        if self.rivers:
+            for edge in map_obj.edges:
+                if not edge.river:
+                    continue
+
+                self.ax.plot(
+                    [edge.corners[0].point[0], edge.corners[1].point[0]],
+                    [edge.corners[0].point[1], edge.corners[1].point[1]],
+                    '-', color='#1b6ee3', linewidth=edge.river)
 
         plt.show()
