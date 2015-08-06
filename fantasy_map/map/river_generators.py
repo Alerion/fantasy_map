@@ -9,7 +9,7 @@ class RandomRiver(object):
         for corner in map_obj.corners:
             downslope = corner
             for neighbour in corner.adjacent:
-                if neighbour.elevation < downslope.elevation:
+                if neighbour.elevation <= downslope.elevation:
                     downslope = neighbour
             corner.downslope = downslope
 
