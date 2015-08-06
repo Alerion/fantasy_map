@@ -9,7 +9,7 @@ class MatplotRenderer(object):
 
     def __init__(self, verbose=False):
         self.verbose = verbose
-        plt.figure(figsize=(10, 10))
+        plt.figure(figsize=(12, 12))
         plt.axis([-0.05, 1.05, -0.05, 1.05])
         self.ax = plt.subplot(1, 1, 1)
 
