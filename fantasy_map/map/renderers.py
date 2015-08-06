@@ -192,7 +192,7 @@ class BiomeRenderer(MatplotRenderer):
     def render(self, map_obj):
         colors = {
             'OCEAN': '#abceff',
-            'LAKE': '#abceff',
+            'LAKE': '#1b6ee3',
             'ICE': '#f0f0f0',
             'MARSH': '#666666',
             'BEACH': '#e9ddc7',
@@ -214,5 +214,14 @@ class BiomeRenderer(MatplotRenderer):
             facecolor = colors[center.biome]
             p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
+
+        for edge in map_obj.edges:
+            if not edge.river:
+                continue
+
+            self.ax.plot(
+                [edge.corners[0].point[0], edge.corners[1].point[0]],
+                [edge.corners[0].point[1], edge.corners[1].point[1]],
+                '-', color='#1b6ee3', linewidth=edge.river)
 
         plt.show()

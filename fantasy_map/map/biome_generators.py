@@ -75,7 +75,9 @@ class Moisture(object):
             biome = 'OCEAN'
         elif center.water:
             if elevation < 0.1:
-                biome = 'MARSH'
+                # FIXME: fix lake elevation at first, not it is set to 0
+                # biome = 'MARSH'
+                biome = 'LAKE'
             elif elevation > 0.8:
                 biome = 'ICE'
             else:

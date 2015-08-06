@@ -6,6 +6,8 @@ Used:
 """
 from __future__ import division
 
+import random
+
 from django.core.management.base import BaseCommand
 
 from fantasy_map.map import (
@@ -18,10 +20,14 @@ from fantasy_map.map.map import Map
 class Command(BaseCommand):
     help = 'Generate new map'
 
-    def handle(self, *args, **options):
-        seed = 1
+    def add_arguments(self, parser):
+        parser.add_argument('--seed', action="store", dest="seed", type=int)
+
+    def handle(self, seed=None, *args, **options):
+        if seed is None:
+            seed = int(random.random() * 10000)
         map_obj = Map(seed, [
-            points_generators.RelaxedPoints(points_number=1000).generate,
+            points_generators.RelaxedPoints(points_number=3000).generate,
             graph_generators.VoronoiGraph().generate,
             # TODO: add this https://github.com/amitp/mapgen2/blob/master/Map.as#L215
             land_generators.SimplexIsland().generate,
