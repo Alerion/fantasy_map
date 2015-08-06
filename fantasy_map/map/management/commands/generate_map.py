@@ -28,7 +28,7 @@ class Command(BaseCommand):
             elevation_generators.FromCoast().generate,
             river_generators.RandomRiver().generate,
             biome_generators.Moisture().generate,
-            renderers.MoistureRenderer().render,
+            renderers.BiomeRenderer().render,
             # renderers.LandRendered().render
             # renderers.GraphRenderer().render_corners
         ])

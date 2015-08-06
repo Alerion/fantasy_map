@@ -185,3 +185,34 @@ class MoistureRenderer(MatplotRenderer):
                 '-', color='#1b6ee3', linewidth=edge.river)
 
         plt.show()
+
+
+class BiomeRenderer(MatplotRenderer):
+
+    def render(self, map_obj):
+        colors = {
+            'OCEAN': '#abceff',
+            'LAKE': '#abceff',
+            'ICE': '#f0f0f0',
+            'MARSH': '#666666',
+            'BEACH': '#e9ddc7',
+            'SNOW': '#ffffff',
+            'TUNDRA': '#777777',
+            'BARE': '#bbbbbb',
+            'SCORCHED': '#999999',
+            'TAIGA': '#ccd4bb',
+            'SHRUBLAND': '#c4ccbb',
+            'TEMPERATE_DESERT': '#e4e8ca',
+            'TEMPERATE_RAIN_FOREST': '#a4c4a8',
+            'TEMPERATE_DECIDUOUS_FOREST': '#b4c9a9',
+            'GRASSLAND': '#c4d4aa',
+            'TROPICAL_RAIN_FOREST': '#9cbba9',
+            'TROPICAL_SEASONAL_FOREST': '#a9cca4',
+            'SUBTROPICAL_DESERT': '#c1b5a2'
+        }
+        for center in map_obj.centers:
+            facecolor = colors[center.biome]
+            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
+            self.ax.add_patch(p)
+
+        plt.show()

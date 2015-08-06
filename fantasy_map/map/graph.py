@@ -16,6 +16,8 @@ class Center(object):
         self.ocean = False  # ocean
         self.coast = False  # land polygon touching an ocean
         self.elevation = 0  # 0.0 - 1.0. average of corners elevations
+        self.moisture = 0  # 0.0 - 1.0
+        self.biome = None
 
 
 class Corner(object):

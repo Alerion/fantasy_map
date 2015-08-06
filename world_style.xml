@@ -124,8 +124,8 @@
     </Rule>
 
     <Rule>
-      <PolygonSymbolizer fill="#999999" />
-      <LineSymbolizer stroke="#999999" stroke-width="1"  stroke-linejoin="round"/>
+      <PolygonSymbolizer fill="#777777" />
+      <LineSymbolizer stroke="#777777" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'TUNDRA'</Filter>
     </Rule>
 
@@ -151,6 +151,18 @@
       <PolygonSymbolizer fill="#e9ddc7" />
       <LineSymbolizer stroke="#e9ddc7" stroke-width="1"  stroke-linejoin="round"/>
       <Filter>[biome] = 'BEACH'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#999999" />
+      <LineSymbolizer stroke="#999999" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[biome] = 'SCORCHED'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#666666" />
+      <LineSymbolizer stroke="#666666" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[biome] = 'MARSH'</Filter>
     </Rule>
   </Style>
 
