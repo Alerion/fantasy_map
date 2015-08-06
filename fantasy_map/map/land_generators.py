@@ -8,12 +8,13 @@ LAKE_THRESHOLD = 0.35  # 0 to 1, fraction of water corners for water polygon
 
 class SimplexIsland(object):
     """
-    Generate lands with Perlin noise.
+    Generate lands with Simplex noise.
     """
 
-    def __init__(self, octaves=8, land_threshold=0):
+    def __init__(self, islands_level=1.5, octaves=8, land_threshold=0):
         self.octaves = octaves
         self.land_threshold = land_threshold
+        self.islands_level = islands_level
 
     def generate(self, map_obj):
         # assign water for corners according to Perlin noise
@@ -23,7 +24,8 @@ class SimplexIsland(object):
                 corner.ocean = True
             else:
                 p = corner.point
-                val = snoise2(p[0], p[1], self.octaves, base=map_obj.seed)
+                val = snoise2(p[0] * self.islands_level, p[1] * self.islands_level,
+                              self.octaves, base=map_obj.seed)
                 corner.water = val < self.land_threshold
 
         ocean_polys = []
