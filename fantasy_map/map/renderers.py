@@ -5,6 +5,7 @@ from __future__ import division
 
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
 
 
 class MatplotRenderer(object):
@@ -23,7 +24,7 @@ class GraphRenderer(MatplotRenderer):
             facecolor = (1, 1, 1)
             if center.border:
                 facecolor = (0.2, 0.2, 0.8)
-            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
+            p = Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
 
             if self.verbose:
@@ -94,7 +95,7 @@ class LandRendered(MatplotRenderer):
             if center.coast:
                 facecolor = '#f0f5ea'
 
-            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
+            p = Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
 
         # render water corners
@@ -139,7 +140,7 @@ class ElevationRenderer(MatplotRenderer):
                 col = 0.2 + (1 - center.elevation) * 0.8
                 facecolor = (col, col, col)
 
-            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
+            p = Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
 
         if self.rivers:
@@ -172,7 +173,7 @@ class MoistureRenderer(MatplotRenderer):
                 col = 0.2 + (1 - center.elevation) * 0.8
                 facecolor = (col, col, col)
 
-            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
+            p = Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
 
         for edge in map_obj.edges:
@@ -190,30 +191,23 @@ class MoistureRenderer(MatplotRenderer):
 class BiomeRenderer(MatplotRenderer):
 
     def render(self, map_obj):
-        colors = {
-            'OCEAN': '#abceff',
-            'LAKE': '#1b6ee3',
-            'ICE': '#f0f0f0',
-            'MARSH': '#666666',
-            'BEACH': '#e9ddc7',
-            'SNOW': '#ffffff',
-            'TUNDRA': '#777777',
-            'BARE': '#bbbbbb',
-            'SCORCHED': '#999999',
-            'TAIGA': '#ccd4bb',
-            'SHRUBLAND': '#c4ccbb',
-            'TEMPERATE_DESERT': '#e4e8ca',
-            'TEMPERATE_RAIN_FOREST': '#a4c4a8',
-            'TEMPERATE_DECIDUOUS_FOREST': '#b4c9a9',
-            'GRASSLAND': '#c4d4aa',
-            'TROPICAL_RAIN_FOREST': '#9cbba9',
-            'TROPICAL_SEASONAL_FOREST': '#a9cca4',
-            'SUBTROPICAL_DESERT': '#c1b5a2'
-        }
         for center in map_obj.centers:
-            facecolor = colors[center.biome]
-            p = matplotlib.patches.Polygon([c.point for c in center.corners], facecolor=facecolor)
-            self.ax.add_patch(p)
+            biome_color = center.biome_color
+            if center.water:
+                p = Polygon([c.point for c in center.corners], color=biome_color)
+                self.ax.add_patch(p)
+            else:
+                lightning = center.lightnings()
+                for i, edge in enumerate(center.borders):
+                    color_low = interpolate_color(biome_color, '#333333', 0.7)
+                    color_high = interpolate_color(biome_color, '#ffffff', 0.3)
+                    if lightning[i] < 0.5:
+                        color = interpolate_color(color_low, biome_color, lightning[i])
+                    else:
+                        color = interpolate_color(biome_color, color_high, lightning[i])
+
+                    poly = [center.point, edge.corners[0].point, edge.corners[1].point]
+                    self.ax.add_patch(Polygon(poly, color=color, linewidth=2, linestyle='dotted'))
 
         for edge in map_obj.edges:
             if not edge.river:
@@ -224,4 +218,43 @@ class BiomeRenderer(MatplotRenderer):
                 [edge.corners[0].point[1], edge.corners[1].point[1]],
                 '-', color='#1b6ee3', linewidth=edge.river)
 
+        plt.show()
+
+
+def interpolate_color(color1, color2, f):
+    """
+    Helper function for color manipulation. When f==0: color1, f==1: color2
+    """
+    color1 = [int(color1[x:x+2], 16) for x in [1, 3, 5]]
+    color2 = [int(color2[x:x+2], 16) for x in [1, 3, 5]]
+    r = (1 - f) * color1[0] + f * color2[0]
+    g = (1 - f) * color1[1] + f * color2[1]
+    b = (1 - f) * color1[2] + f * color2[2]
+
+    if r > 255:
+        r = 0
+    if g > 255:
+        g = 0
+    if b > 255:
+        b = 0
+    return '#%02x%02x%02x' % (r, g, b)
+
+
+class LightRender(MatplotRenderer):
+
+    def render(self, map_obj):
+        for center in map_obj.centers:
+            if center.water:
+                facecolor = '#1b6ee3'
+                if center.ocean:
+                    facecolor = '#abceff'
+                p = Polygon([c.point for c in center.corners], facecolor=facecolor)
+                self.ax.add_patch(p)
+            else:
+                lightning = center.lightnings()
+                for i, edge in enumerate(center.borders):
+                    col = lightning[i]
+                    facecolor = (col, col, col)
+                    poly = [center.point, edge.corners[0].point, edge.corners[1].point]
+                    self.ax.add_patch(Polygon(poly, facecolor=facecolor))
         plt.show()

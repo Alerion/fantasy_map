@@ -26,6 +26,7 @@ class Command(BaseCommand):
     def handle(self, seed=None, *args, **options):
         if seed is None:
             seed = int(random.random() * 10000)
+        print('seed = %s' % seed)
         map_obj = Map(seed, [
             points_generators.RelaxedPoints(points_number=3000).generate,
             graph_generators.VoronoiGraph().generate,
@@ -35,7 +36,7 @@ class Command(BaseCommand):
             river_generators.RandomRiver().generate,
             biome_generators.Moisture().generate,
             renderers.BiomeRenderer().render,
-            # renderers.LandRendered().render
+            # renderers.LightRender().render
             # renderers.GraphRenderer().render_corners
         ])
 
