@@ -26,7 +26,7 @@ Follow this https://github.com/mapnik/mapnik/wiki/UbuntuInstallation. Tested wit
 If packages are not available follow [this instruction](<http://www.postgresql.org/download/linux/ubuntu/>)
 how to add repository. (Check Ubuntu version ``lsb_release -a``)
 
-## Install GeoDjango, PostGIS and other
+## Install GeoDjango, PostGIS, GDAL and other
 
 https://docs.djangoproject.com/en/1.8/ref/contrib/gis/install/
 

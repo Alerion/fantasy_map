@@ -68,7 +68,7 @@
     </Rule>
   </Style>
 
-  <Style name="biomes" comp-op="multiply">
+  <Style name="biomes">
     <Rule>
       <PolygonSymbolizer fill="#a4c4a8"/>
       <LineSymbolizer stroke="#a4c4a8" stroke-width="1"  stroke-linejoin="round"/>
@@ -166,7 +166,13 @@
     </Rule>
   </Style>
 
-  <Layer name="world" status="on" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+  <Style name="hillshade">
+    <Rule>
+      <RasterSymbolizer opacity="0.5" scaling="bilinear" comp-op="multiply" />
+    </Rule>
+  </Style>
+
+  <Layer name="world" status="off" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
     <StyleName>heights</StyleName>
     <Datasource>
       <Parameter name="type">postgis</Parameter>
@@ -187,6 +193,14 @@
       <Parameter name="password">alerion</Parameter>
       <Parameter name="dbname">fantasy_map</Parameter>
       <Parameter name="table">main_biome</Parameter>
+    </Datasource>
+  </Layer>
+
+  <Layer name="hillshade" status="on">
+    <StyleName>hillshade</StyleName>
+    <Datasource>
+      <Parameter name="type">gdal</Parameter>
+      <Parameter name="file">map.tif</Parameter>
     </Datasource>
   </Layer>
 </Map>
