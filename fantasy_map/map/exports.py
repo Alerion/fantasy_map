@@ -119,15 +119,8 @@ class GeoTiffExporter(object):
                 poly = Poly([center.point, c1.point, c2.point])
                 minx, miny, maxx, maxy = poly.bounds
 
-                img_minx = int(minx * size[1]) - 1
-                img_miny = int(miny * size[0]) - 1
-                img_maxx = int(maxx * size[1]) + 1
-                img_maxy = int(maxy * size[0]) + 1
-
-                for j in xrange(img_miny, img_maxy):
-                    for i in xrange(img_minx, img_maxx):
-                        # convert image coordinates to our coordinates in range 0-1
-                        x, y = (i / size[1]), (j / size[0])
+                for x in np.arange(minx, maxx, 0.0005):
+                    for y in np.arange(miny, maxy, 0.0005):
                         if poly.contains(Point(x, y)):
                             # calculate elevation and convert to pixel value
                             z = (a * x + b * y - d) / -c
@@ -136,11 +129,22 @@ class GeoTiffExporter(object):
                             img_x, img_y = self.point_to_pixel((x, y), inv_geo, coord_transform)
                             raster[img_y][img_x] = value
 
+                # for j in xrange(img_miny, img_maxy):
+                #     for i in xrange(img_minx, img_maxx):
+                #         # convert image coordinates to our coordinates in range 0-1
+                #         x, y = (i / size[1]), (j / size[0])
+                #         if poly.contains(Point(x, y)):
+                #             # calculate elevation and convert to pixel value
+                #             z = (a * x + b * y - d) / -c
+                #             value = int(255 * (1 - z))
+                #             # get pixel coordinates from our coordinates(0-1)
+                #             img_x, img_y = self.point_to_pixel((x, y), inv_geo, coord_transform)
+                #             raster[img_y][img_x] = value
+
         for corner in map_obj.corners:
             x, y = self.point_to_pixel(corner.point, inv_geo, coord_transform)
             raster[y][x] = 0
 
-        self.fix_raster(raster)
         return raster
 
     def get_in_projection(self):
@@ -182,9 +186,3 @@ class GeoTiffExporter(object):
         """
         lng, lat = self.point_to_lnglat(point)
         return self.get_pixel(lng, lat, inv_geo, transform)
-
-    def fix_raster(self, raster):
-        """
-        Fix artifacts.
-        """
-        print(raster.shape)
