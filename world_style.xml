@@ -126,7 +126,7 @@
     <StyleName>hillshade</StyleName>
     <Datasource>
       <Parameter name="type">gdal</Parameter>
-      <Parameter name="file">/home/alerion/Workspace/fantasy_map/map.tif</Parameter>
+      <Parameter name="file">map.tif</Parameter>
     </Datasource>
   </Layer>
 </Map>
