@@ -5,7 +5,6 @@ import gdal
 import numpy as np
 import osr
 
-from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.geos import Polygon, MultiPolygon
 from shapely.geometry import Polygon as Poly, Point
 
@@ -20,11 +19,6 @@ class ModelExporter(object):
     def export(self, map_obj):
         self.model.objects.all().delete()
         for center in map_obj.centers:
-            # Do not save ocean for optimization
-            # FIXME: But we need them
-            if center.ocean:
-                continue
-
             obj = self.model()
             obj.biome = center.biome
             obj.water = center.water
@@ -66,9 +60,10 @@ class GeoTiffExporter(object):
         # http://gis.stackexchange.com/questions/62343/how-can-i-convert-a-ascii-file-to-geotiff-using-python
         dst_filename = '/home/alerion/Workspace/fantasy_map/map.tif'
         x_pixels, y_pixels = 1000, 1000
-        PIXEL_SIZE = self.max_lat * 60 * 60 / x_pixels
-        x_min = -(x_pixels / 2 * PIXEL_SIZE)
-        y_max = y_pixels / 2 * PIXEL_SIZE
+        X_PIXEL_SIZE = self.max_lat * 110.574 * 1000 / x_pixels
+        Y_PIXEL_SIZE = self.max_lng * 107.551 * 1000 / y_pixels
+        x_min = -(x_pixels / 2 * X_PIXEL_SIZE)
+        y_max = y_pixels / 2 * Y_PIXEL_SIZE
         driver = gdal.GetDriverByName('GTiff')
 
         srs = osr.SpatialReference()
@@ -79,18 +74,18 @@ class GeoTiffExporter(object):
             x_pixels,
             y_pixels,
             1,  # bands count
-            gdal.GDT_UInt16)
+            gdal.GDT_Byte)
 
         dataset.SetGeoTransform((
             x_min,    # 0
-            PIXEL_SIZE,  # 1
+            X_PIXEL_SIZE,  # 1
             0,                      # 2
             y_max,    # 3
             0,                      # 4
-            -PIXEL_SIZE))
+            -Y_PIXEL_SIZE))
 
-        raster = np.zeros((x_pixels, y_pixels), dtype=np.uint16)
-        raster.fill(65535)
+        raster = np.zeros((x_pixels, y_pixels), dtype=np.uint8)
+        raster.fill(255)
         self._render_centers(map_obj, raster)
 
         dataset.SetProjection(srs.ExportToWkt())
@@ -149,4 +144,11 @@ class GeoTiffExporter(object):
                         y = j / y_pixels
                         if poly.contains(Point(x, y)):
                             z = (a * x + b * y - d) / -c
-                            raster[j][i] = int(65535 * (1 - z))
+                            raster[y_pixels - j][i] = int(255 * (1 - z))
+
+        for corner in map_obj.corners:
+            i = int(corner.point[0] * x_pixels)
+            j = y_pixels - int(corner.point[1] * y_pixels)
+
+            if i < 1000 and j < 1000:
+                raster[j][i] = 0

@@ -7,6 +7,7 @@ BIOMES = (
     ('ICE', 'Ice'),
     ('LAKE', 'Lake'),
     ('MARSH', 'Marsh'),
+    ('OCEAN', 'OCEAN'),
     ('SCORCHED', 'Scorched'),
     ('SHRUBLAND', 'Shrubland'),
     ('SNOW', 'Snow'),
