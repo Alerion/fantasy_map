@@ -21,6 +21,8 @@ class ModelExporter(object):
 
     def export(self, map_obj):
         self.model.objects.all().delete()
+        new_objects = []
+
         for center in map_obj.centers:
             obj = self.model()
             obj.biome = center.biome
@@ -40,7 +42,9 @@ class ModelExporter(object):
 
             obj.geom = MultiPolygon([Polygon(coords)])
             obj.full_clean()
-            obj.save()
+            new_objects.append(obj)
+
+        self.model.objects.bulk_create(new_objects)
 
     def point_to_lnglat(self, point):
         return (
