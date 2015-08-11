@@ -54,47 +54,53 @@ class GeoTiffExporter(object):
         # FIXME: allow any sizes
         assert max_lng == max_lat
 
+    def get_in_projection(self):
+        proj = osr.SpatialReference()
+        proj.ImportFromEPSG(4326)
+        return proj
+
+    def get_out_projection(self):
+        proj = osr.SpatialReference()
+        proj.ImportFromEPSG(3857)
+        return proj
+
     def export(self, map_obj):
         # http://www.gdal.org/gdal_tutorial.html
-        # http://gis.stackexchange.com/questions/58517/python-gdal-save-array-as-raster-with-projection-from-other-file
-        # http://gis.stackexchange.com/questions/62343/how-can-i-convert-a-ascii-file-to-geotiff-using-python
+        # http://blambi.blogspot.com/2010/05/making-geo-referenced-images-in-python.html
+
         dst_filename = '/home/alerion/Workspace/fantasy_map/map.tif'
-        x_pixels, y_pixels = 1000, 1000
-        X_PIXEL_SIZE = self.max_lat * 110.574 * 1000 / x_pixels
-        Y_PIXEL_SIZE = self.max_lng * 107.551 * 1000 / y_pixels
-        x_min = -(x_pixels / 2 * X_PIXEL_SIZE)
-        y_max = y_pixels / 2 * Y_PIXEL_SIZE
-        driver = gdal.GetDriverByName('GTiff')
+        in_srs = self.get_in_projection()
+        out_srs = self.get_out_projection()
 
-        srs = osr.SpatialReference()
-        srs.ImportFromEPSG(3857)
+        coord_transform = osr.CoordinateTransformation(in_srs, out_srs)
 
-        dataset = driver.Create(
+        top_left_point = (-(self.max_lng / 2), self.max_lat / 2)
+        bot_right_point = (self.max_lng / 2, -(self.max_lat / 2))
+
+        top_left_lng_m, top_left_lat_m, _ = coord_transform.TransformPoint(*top_left_point)
+        bot_right_lng_m, bot_right_lat_m, _ = coord_transform.TransformPoint(*bot_right_point)
+
+        x_pixels = 1000
+        PIXEL_SIZE = abs(top_left_lng_m - bot_right_lng_m) / x_pixels
+        y_pixels = int(abs(bot_right_lat_m - top_left_lat_m) / PIXEL_SIZE) + 1
+        x_pixels += 1
+
+        geo = [top_left_lng_m, PIXEL_SIZE, 0, top_left_lat_m, 0, -PIXEL_SIZE]
+        inv_geo = gdal.InvGeoTransform(geo)[1]
+
+        dataset = gdal.GetDriverByName('GTiff').Create(
             dst_filename,
             x_pixels,
             y_pixels,
             1,  # bands count
             gdal.GDT_Byte)
 
-        dataset.SetGeoTransform((
-            x_min,    # 0
-            X_PIXEL_SIZE,  # 1
-            0,                      # 2
-            y_max,    # 3
-            0,                      # 4
-            -Y_PIXEL_SIZE))
+        dataset.SetGeoTransform(geo)
 
-        raster = np.zeros((x_pixels, y_pixels), dtype=np.uint8)
+        raster = np.zeros((y_pixels, x_pixels), dtype=np.uint8)
         raster.fill(255)
-        self._render_centers(map_obj, raster)
 
-        dataset.SetProjection(srs.ExportToWkt())
-        dataset.GetRasterBand(1).WriteArray(raster)
-        dataset.FlushCache()  # Write to disk.
-
-    def _render_centers(self, map_obj, raster):
-        x_pixels = raster.shape[0]
-        y_pixels = raster.shape[1]
+        # render centers
         count = len(map_obj.centers)
         completed = 0
         for center in map_obj.centers:
@@ -144,11 +150,30 @@ class GeoTiffExporter(object):
                         y = j / y_pixels
                         if poly.contains(Point(x, y)):
                             z = (a * x + b * y - d) / -c
-                            raster[y_pixels - j][i] = int(255 * (1 - z))
+                            value = int(255 * (1 - z))
+                            x, y = self.point_to_pixel((x, y), inv_geo, coord_transform)
+                            raster[y][x] = value
 
         for corner in map_obj.corners:
-            i = int(corner.point[0] * x_pixels)
-            j = y_pixels - int(corner.point[1] * y_pixels)
+            x, y = self.point_to_pixel(corner.point, inv_geo, coord_transform)
+            raster[y][x] = 0
+        # end of render
 
-            if i < 1000 and j < 1000:
-                raster[j][i] = 0
+        dataset.SetProjection(out_srs.ExportToWkt())
+        dataset.GetRasterBand(1).WriteArray(raster)
+        dataset.FlushCache()  # Write to disk.
+
+    def get_pixel(self, lng, lat, inv_geo, transform):
+        (gx, gy, gz) = transform.TransformPoint(lng, lat)
+        (gx, gy) = gdal.ApplyGeoTransform(inv_geo, gx, gy)
+        return (int(gx), int(gy))
+
+    def point_to_lnglat(self, point):
+        return (
+            self.max_lng * point[0] - self.max_lng / 2,
+            self.max_lat * point[1] - self.max_lat / 2
+        )
+
+    def point_to_pixel(self, point, inv_geo, transform):
+        lng, lat = self.point_to_lnglat(point)
+        return self.get_pixel(lng, lat, inv_geo, transform)
