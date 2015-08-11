@@ -45,44 +45,6 @@ class Center(object):
     def biome_color(self):
         return BIOME_COLORS[self.biome]
 
-    def lightnings(self):
-        # Return light level for each edge (0-1).
-        light_vector = np.array([1, 1, 1])
-        light_vector = light_vector / np.linalg.norm(light_vector)
-        output = []
-
-        for edge in self.borders:
-            c1 = edge.corners[0]
-            c2 = edge.corners[1]
-
-            v1 = np.array([
-                self.point[0],
-                self.point[1],
-                self.elevation
-            ])
-
-            v2 = np.array([
-                c1.point[0],
-                c1.point[1],
-                c1.elevation
-            ])
-
-            v3 = np.array([
-                c2.point[0],
-                c2.point[1],
-                c2.elevation
-            ])
-
-            normal = np.cross(v2 - v1, v3 - v1)
-            if normal[2] < 0:
-                normal *= -1
-
-            normal = normal / np.linalg.norm(normal)
-            light = 0.5 + 0.5 * np.dot(normal, light_vector)
-            output.append(light)
-
-        return output
-
 
 class Corner(object):
 

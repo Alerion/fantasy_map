@@ -197,20 +197,22 @@ class MoistureRenderer(MatplotRenderer):
 class BiomeRenderer(MatplotRenderer):
 
     def render(self, map_obj):
+        light_vector = np.array([1, 1, 1])
+
         for center in map_obj.centers:
             biome_color = center.biome_color
             if center.water:
                 p = Polygon([c.point for c in center.corners], color=biome_color)
                 self.ax.add_patch(p)
             else:
-                lightning = center.lightnings()
-                for i, edge in enumerate(center.borders):
+                for edge in center.borders:
+                    lightning = calc_lightning(center, edge, light_vector)
                     color_low = interpolate_color(biome_color, '#333333', 0.7)
                     color_high = interpolate_color(biome_color, '#ffffff', 0.3)
-                    if lightning[i] < 0.5:
-                        color = interpolate_color(color_low, biome_color, lightning[i])
+                    if lightning < 0.5:
+                        color = interpolate_color(color_low, biome_color, lightning)
                     else:
-                        color = interpolate_color(biome_color, color_high, lightning[i])
+                        color = interpolate_color(biome_color, color_high, lightning)
 
                     poly = [center.point, edge.corners[0].point, edge.corners[1].point]
                     self.ax.add_patch(Polygon(poly, color=color, linewidth=2, linestyle='dotted'))
@@ -225,6 +227,39 @@ class BiomeRenderer(MatplotRenderer):
                 '-', color='#1b6ee3', linewidth=edge.river)
 
         plt.show()
+
+
+def calc_lightning(center, edge, light_vector):
+    # Return light level for each edge (0-1).
+    light_vector = light_vector / np.linalg.norm(light_vector)
+
+    c1 = edge.corners[0]
+    c2 = edge.corners[1]
+
+    v1 = np.array([
+        center.point[0],
+        center.point[1],
+        center.elevation
+    ])
+
+    v2 = np.array([
+        c1.point[0],
+        c1.point[1],
+        c1.elevation
+    ])
+
+    v3 = np.array([
+        c2.point[0],
+        c2.point[1],
+        c2.elevation
+    ])
+
+    normal = np.cross(v2 - v1, v3 - v1)
+    if normal[2] < 0:
+        normal *= -1
+
+    normal = normal / np.linalg.norm(normal)
+    return 0.5 + 0.5 * np.dot(normal, light_vector)
 
 
 def interpolate_color(color1, color2, f):
@@ -244,26 +279,6 @@ def interpolate_color(color1, color2, f):
     if b > 255:
         b = 0
     return '#%02x%02x%02x' % (r, g, b)
-
-
-class LightRender(MatplotRenderer):
-
-    def render(self, map_obj):
-        for center in map_obj.centers:
-            if center.water:
-                facecolor = '#1b6ee3'
-                if center.ocean:
-                    facecolor = '#abceff'
-                p = Polygon([c.point for c in center.corners], facecolor=facecolor)
-                self.ax.add_patch(p)
-            else:
-                lightning = center.lightnings()
-                for i, edge in enumerate(center.borders):
-                    col = lightning[i]
-                    facecolor = (col, col, col)
-                    poly = [center.point, edge.corners[0].point, edge.corners[1].point]
-                    self.ax.add_patch(Polygon(poly, facecolor=facecolor))
-        plt.show()
 
 
 class GeoTiff(object):
@@ -289,7 +304,7 @@ class GeoTiff(object):
             x_pixels,
             y_pixels,
             1,
-            gdal.GDT_Byte)
+            gdal.GDT_UInt16)
 
         dataset.SetGeoTransform((
             x_min,    # 0
@@ -299,8 +314,8 @@ class GeoTiff(object):
             0,                      # 4
             -PIXEL_SIZE))
 
-        raster = np.zeros((x_pixels, y_pixels), dtype=np.uint8)
-        raster.fill(255)
+        raster = np.zeros((x_pixels, y_pixels), dtype=np.uint16)
+        raster.fill(65535)
         self._render_centers(map_obj, raster)
 
         dataset.SetProjection(srs.ExportToWkt())
@@ -362,4 +377,4 @@ class GeoTiff(object):
                         y = j / y_pixels
                         if poly.contains(Point(x, y)):
                             z = (a * x + b * y - d) / -c
-                            raster[i][j] = 255 - int(255 * z)
+                            raster[i][j] = int(65535 * (1 - z))
