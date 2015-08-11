@@ -50,13 +50,13 @@ class Command(BaseCommand):
             obj.border = (node.get('border') == 'true')
             obj.elevation = float(node.get('elevation'))
             obj.moisture = float(node.get('moisture'))
-            obj.lat = float(node.get('y')) * max_lat / max_y - 25
-            obj.lng = float(node.get('x')) * max_lng / max_x - 25
+            obj.lat = float(node.get('y')) * max_lat / max_y - 35
+            obj.lng = float(node.get('x')) * max_lng / max_x - 35
             coords = []
             for cnode in node.xpath('corner'):
                 corner = corners[cnode.get('id')]
-                lat = float(corner.get('y')) * max_lat / max_y - 25
-                lng = float(corner.get('x')) * max_lng / max_x - 25
+                lat = float(corner.get('y')) * max_lat / max_y - 35
+                lng = float(corner.get('x')) * max_lng / max_x - 35
                 coords.append((lng, lat))
             # sort coordinates
             coords.sort(key=lambda p: math.atan2(p[1] - obj.lat, p[0] - obj.lng))

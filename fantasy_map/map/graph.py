@@ -4,24 +4,24 @@ Based on http://www-cs-students.stanford.edu/~amitp/game-programming/grids/#rela
 import numpy as np
 
 BIOME_COLORS = {
-    'OCEAN': '#abceff',
-    'LAKE': '#1b6ee3',
-    'ICE': '#f0f0f0',
-    'MARSH': '#666666',
-    'BEACH': '#e9ddc7',
-    'SNOW': '#ffffff',
-    'TUNDRA': '#777777',
     'BARE': '#bbbbbb',
+    'BEACH': '#e9ddc7',
+    'GRASSLAND': '#c4d4aa',
+    'ICE': '#f0f0f0',
+    'LAKE': '#1b6ee3',
+    'MARSH': '#666666',
+    'OCEAN': '#abceff',
     'SCORCHED': '#999999',
-    'TAIGA': '#ccd4bb',
     'SHRUBLAND': '#c4ccbb',
+    'SNOW': '#ffffff',
+    'SUBTROPICAL_DESERT': '#c1b5a2',
+    'TAIGA': '#ccd4bb',
+    'TEMPERATE_DECIDUOUS_FOREST': '#b4c9a9',
     'TEMPERATE_DESERT': '#e4e8ca',
     'TEMPERATE_RAIN_FOREST': '#a4c4a8',
-    'TEMPERATE_DECIDUOUS_FOREST': '#b4c9a9',
-    'GRASSLAND': '#c4d4aa',
     'TROPICAL_RAIN_FOREST': '#9cbba9',
     'TROPICAL_SEASONAL_FOREST': '#a9cca4',
-    'SUBTROPICAL_DESERT': '#c1b5a2'
+    'TUNDRA': '#777777',
 }
 
 

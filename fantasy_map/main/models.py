@@ -1,21 +1,23 @@
 from django.contrib.gis.db import models
 
 BIOMES = (
-    ('TEMPERATE_RAIN_FOREST', 'Rain forest'),
-    ('TEMPERATE_DESERT', 'Desert'),
+    ('BARE', 'Bare'),
+    ('BEACH', 'Beach'),
+    ('GRASSLAND', 'Grassland'),
+    ('ICE', 'Ice'),
+    ('LAKE', 'Lake'),
+    ('MARSH', 'Marsh'),
+    ('SCORCHED', 'Scorched'),
+    ('SHRUBLAND', 'Shrubland'),
     ('SNOW', 'Snow'),
     ('SUBTROPICAL_DESERT', 'Subtropical deset'),
-    ('TEMPERATE_DECIDUOUS_FOREST', 'Deciduous foreset'),
     ('TAIGA', 'Taiga'),
+    ('TEMPERATE_DECIDUOUS_FOREST', 'Deciduous foreset'),
+    ('TEMPERATE_DESERT', 'Desert'),
+    ('TEMPERATE_RAIN_FOREST', 'Rain forest'),
     ('TROPICAL_RAIN_FOREST', 'Tropical rain forest'),
-    ('LAKE', 'Lake'),
-    ('BARE', 'Bare'),
-    ('TUNDRA', 'Tundra'),
-    ('GRASSLAND', 'Grassland'),
     ('TROPICAL_SEASONAL_FOREST', 'Tropical seasonal forest'),
-    ('SHRUBLAND', 'Shrubland'),
-    ('BEACH', 'Beach'),
-    ('MARSH', 'Marsh')
+    ('TUNDRA', 'Tundra'),
 )
 
 
