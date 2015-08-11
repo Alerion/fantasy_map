@@ -7,6 +7,7 @@ import osr
 
 from django.contrib.gis.geos import Polygon, MultiPolygon
 from shapely.geometry import Polygon as Poly, Point
+from scipy.ndimage.filters import median_filter
 
 
 class ModelExporter(object):
@@ -54,6 +55,7 @@ class GeoTiffExporter(object):
         self.dst_filename = '/home/alerion/Workspace/fantasy_map/map.tif'
         self.top_left_point = (-(max_lng / 2), max_lat / 2)
         self.bot_right_point = (max_lng / 2, -(max_lat / 2))
+        self.max_height = 2500
 
     def export(self, map_obj):
         # http://www.gdal.org/gdal_tutorial.html
@@ -75,6 +77,8 @@ class GeoTiffExporter(object):
         geo = [top_left_lng_m, PIXEL_SIZE, 0, top_left_lat_m, 0, -PIXEL_SIZE]
         inv_geo = gdal.InvGeoTransform(geo)[1]
         image_data = self.get_image_data(map_obj, (y_pixels, x_pixels), inv_geo, coord_transform)
+        image_data *= self.max_height
+        image_data = self.add_hillshade(image_data, 45, 45)
 
         # create image
         dataset = gdal.GetDriverByName('GTiff').Create(
@@ -90,61 +94,66 @@ class GeoTiffExporter(object):
         dataset.FlushCache()  # Write to disk.
 
     def get_image_data(self, map_obj, size, inv_geo, coord_transform):
-        raster = np.zeros(size, dtype=np.uint8)
-        raster.fill(255)
+        raster = np.zeros(size, dtype=np.float32)
 
-        count = len(map_obj.centers)
-        completed = 0
-        for center in map_obj.centers:
-            completed += 1
-            if completed % 100 == 0:
-                print '%s of %s' % (completed, count)
+        if True:
+            step = 0.5 / size[0]
+            count = len(map_obj.centers)
+            completed = 0
+            for center in map_obj.centers:
+                completed += 1
+                if completed % 100 == 0:
+                    print '%s of %s' % (completed, count)
 
-            if center.water:
-                continue
+                if center.water:
+                    continue
 
-            for edge in center.borders:
+                for edge in center.borders:
+                    c1 = edge.corners[0]
+                    c2 = edge.corners[1]
+
+                    # get the equation of a plane from three points
+                    v1 = np.array([center.point[0], center.point[1], center.elevation])
+                    v2 = np.array([c1.point[0], c1.point[1], c1.elevation])
+                    v3 = np.array([c2.point[0], c2.point[1], c2.elevation])
+                    normal = np.cross(v2 - v1, v3 - v1)
+                    a, b, c = normal
+                    d = np.dot(normal, v3)
+
+                    # calculate elevation for all points in polygon
+                    poly = Poly([center.point, c1.point, c2.point])
+                    minx, miny, maxx, maxy = poly.bounds
+
+                    for x in np.arange(minx, maxx, step):
+                        for y in np.arange(miny, maxy, step):
+                            if poly.contains(Point(x, y)):
+                                # calculate elevation and convert to pixel value
+                                z = (a * x + b * y - d) / -c
+                                value = 1 - z
+                                # get pixel coordinates from our coordinates(0-1)
+                                img_x, img_y = self.point_to_pixel((x, y), inv_geo, coord_transform)
+                                raster[img_y][img_x] = value
+
+        if False:
+            for edge in map_obj.edges:
                 c1 = edge.corners[0]
                 c2 = edge.corners[1]
+                v1 = np.array([c1.point[0], c1.point[1], c1.elevation])
+                v2 = np.array([c2.point[0], c2.point[1], c2.elevation])
+                d = v2 - v1
 
-                # get the equation of a plane from three points
-                v1 = np.array([center.point[0], center.point[1], center.elevation])
-                v2 = np.array([c1.point[0], c1.point[1], c1.elevation])
-                v3 = np.array([c2.point[0], c2.point[1], c2.elevation])
-                normal = np.cross(v2 - v1, v3 - v1)
-                a, b, c = normal
-                d = np.dot(normal, v3)
+                for t in np.arange(0, 1, 0.01):
+                    x, y, z = v1 + d * t
+                    value = 1 - z
+                    # get pixel coordinates from our coordinates(0-1)
+                    img_x, img_y = self.point_to_pixel((x, y), inv_geo, coord_transform)
+                    raster[img_y][img_x] = value
 
-                # calculate elevation for all points in polygon
-                poly = Poly([center.point, c1.point, c2.point])
-                minx, miny, maxx, maxy = poly.bounds
+        # for corner in map_obj.corners:
+        #     x, y = self.point_to_pixel(corner.point, inv_geo, coord_transform)
+        #     raster[y][x] = (1 - corner.elevation) * 255
 
-                for x in np.arange(minx, maxx, 0.0005):
-                    for y in np.arange(miny, maxy, 0.0005):
-                        if poly.contains(Point(x, y)):
-                            # calculate elevation and convert to pixel value
-                            z = (a * x + b * y - d) / -c
-                            value = int(255 * (1 - z))
-                            # get pixel coordinates from our coordinates(0-1)
-                            img_x, img_y = self.point_to_pixel((x, y), inv_geo, coord_transform)
-                            raster[img_y][img_x] = value
-
-                # for j in xrange(img_miny, img_maxy):
-                #     for i in xrange(img_minx, img_maxx):
-                #         # convert image coordinates to our coordinates in range 0-1
-                #         x, y = (i / size[1]), (j / size[0])
-                #         if poly.contains(Point(x, y)):
-                #             # calculate elevation and convert to pixel value
-                #             z = (a * x + b * y - d) / -c
-                #             value = int(255 * (1 - z))
-                #             # get pixel coordinates from our coordinates(0-1)
-                #             img_x, img_y = self.point_to_pixel((x, y), inv_geo, coord_transform)
-                #             raster[img_y][img_x] = value
-
-        for corner in map_obj.corners:
-            x, y = self.point_to_pixel(corner.point, inv_geo, coord_transform)
-            raster[y][x] = 0
-
+        raster = median_filter(raster, size=(5, 5))
         return raster
 
     def get_in_projection(self):
@@ -186,3 +195,17 @@ class GeoTiffExporter(object):
         """
         lng, lat = self.point_to_lnglat(point)
         return self.get_pixel(lng, lat, inv_geo, transform)
+
+    def add_hillshade(self, array, azimuth, angle_altitude):
+        """
+        From here http://geoexamples.blogspot.com/2014/03/shaded-relief-images-using-gdal-python.html
+        """
+        x, y = np.gradient(array)
+        slope = np.pi/2. - np.arctan(np.sqrt(x*x + y*y))
+        aspect = np.arctan2(-x, y)
+        azimuthrad = azimuth*np.pi / 180.
+        altituderad = angle_altitude*np.pi / 180.
+
+        shaded = np.sin(altituderad) * np.sin(slope) + np.cos(altituderad) * np.cos(slope) \
+            * np.cos(azimuthrad - aspect)
+        return 255*(shaded + 1)/2

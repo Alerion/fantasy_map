@@ -28,6 +28,7 @@ class Command(BaseCommand):
         if seed is None:
             seed = int(random.random() * 10000)
         print('seed = %s' % seed)
+        max_lat, max_lng = 70, 70
         map_obj = Map(seed, [
             points_generators.RelaxedPoints(points_number=1000).generate,
             graph_generators.VoronoiGraph().generate,
@@ -36,9 +37,8 @@ class Command(BaseCommand):
             elevation_generators.FromCoast().generate,
             river_generators.RandomRiver().generate,
             biome_generators.Moisture().generate,
-            exports.ModelExporter(Biome, max_lat=70., max_lng=70.).export,
-            exports.GeoTiffExporter(max_lat=70., max_lng=70.).export,
-            # renderers.GeoTiff().render,
+            # exports.ModelExporter(Biome, max_lat=max_lat, max_lng=max_lng).export,
+            exports.GeoTiffExporter(max_lat=max_lat, max_lng=max_lng).export,
             # renderers.BiomeRenderer().render,
         ])
 
