@@ -56,7 +56,7 @@ class ModelExporter(object):
 
 class GeoTiffExporter(object):
 
-    def __init__(self, max_lat, max_lng, width=1000):
+    def __init__(self, max_lat, max_lng, width=1000, hill_noise=True):
         self.max_lat = max_lat
         self.max_lng = max_lng
         self.dst_filename = os.path.join(settings.BASE_DIR, 'map.tif')
@@ -64,6 +64,7 @@ class GeoTiffExporter(object):
         self.bot_right_point = (max_lng / 2, -(max_lat / 2))
         self.max_height = 500  # elevation will be scaled to this value
         self.width = width
+        self.hill_noise = hill_noise
 
     # @profile  # 5624515 function calls in 9.509 seconds
     def export(self, map_obj):
@@ -89,7 +90,8 @@ class GeoTiffExporter(object):
 
         image_data = median_filter(image_data, (6, 6))
         # image_data = gaussian_filter(image_data, sigma=1)
-        self.add_noise(image_data, map_obj.seed)
+        if self.hill_noise:
+            self.add_noise(image_data, map_obj.seed)
 
         image_data *= self.max_height
         image_data = self.add_hillshade(image_data, 225, 45)
@@ -148,6 +150,7 @@ class GeoTiffExporter(object):
                 poly = Poly([center.point, cp1, cp2])
                 minx, miny, maxx, maxy = poly.bounds
 
+                # TODO: requires some optimization, too many checks here
                 for x in np.arange(minx, maxx, step):
                     for y in np.arange(miny, maxy, step):
                         if in_triange((x, y), v1, cp1, cp2):

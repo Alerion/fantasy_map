@@ -27,9 +27,12 @@ class Command(BaseCommand):
         parser.add_argument('--seed', action="store", dest="seed", type=int)
         parser.add_argument('--points', action="store", dest="points", type=int, default=1000)
         parser.add_argument(
+            '--hill_noise', action="store", dest="hill_noise", type=bool, default=False)
+        parser.add_argument(
             '--heights_map_width', action="store", dest="heights_map_width", type=int, default=1000)
 
-    def handle(self, max_lat, max_lng, seed, points, heights_map_width, *args, **options):
+    def handle(self, max_lat, max_lng, seed, points, hill_noise, heights_map_width,
+               *args, **options):
         if seed is None:
             seed = int(random.random() * 10000)
         print('seed = %s' % seed)
@@ -43,8 +46,7 @@ class Command(BaseCommand):
             river_generators.RandomRiver().generate,
             biome_generators.Moisture().generate,
             exports.ModelExporter(Biome, max_lat=max_lat, max_lng=max_lng).export,
-            exports.GeoTiffExporter(
-                max_lat=max_lat, max_lng=max_lng, width=heights_map_width).export,
+            exports.GeoTiffExporter(max_lat, max_lng, heights_map_width, hill_noise).export,
             # renderers.BiomeRenderer().render,
         ])
 
