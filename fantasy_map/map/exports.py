@@ -1,15 +1,32 @@
 from __future__ import division
 
+import cProfile
 import math
 import gdal
 import numpy as np
 import osr
 import os
+import pstats
 
 from django.conf import settings
 from django.contrib.gis.geos import Polygon, MultiPolygon
 from scipy.ndimage.filters import gaussian_filter
 from shapely.geometry import Polygon as Poly, Point
+
+# 5624515 function calls in 9.509 seconds
+
+
+def profile(func):
+    """Decorator for run function profile"""
+    def wrapper(*args, **kwargs):
+        profile_filename = func.__name__ + '.prof'
+        profiler = cProfile.Profile()
+        result = profiler.runcall(func, *args, **kwargs)
+        profiler.dump_stats(profile_filename)
+        p = pstats.Stats(profile_filename)
+        p.sort_stats('time').print_stats(10)
+        return result
+    return wrapper
 
 
 class ModelExporter(object):
@@ -64,6 +81,7 @@ class GeoTiffExporter(object):
         self.max_height = 500  # elevation will be scaled to this value
         self.width = 1000
 
+    # @profile
     def export(self, map_obj):
         # http://www.gdal.org/gdal_tutorial.html
         # http://blambi.blogspot.com/2010/05/making-geo-referenced-images-in-python.html
@@ -124,25 +142,28 @@ class GeoTiffExporter(object):
             if center.water:
                 continue
 
+            v1 = np.array([center.point[0], center.point[1], center.elevation])
+
             for edge in center.borders:
                 c1 = edge.corners[0]
                 c2 = edge.corners[1]
+                cp1 = c1.point
+                cp2 = c2.point
 
                 # get the equation of a plane from three points
-                v1 = np.array([center.point[0], center.point[1], center.elevation])
-                v2 = np.array([c1.point[0], c1.point[1], c1.elevation])
-                v3 = np.array([c2.point[0], c2.point[1], c2.elevation])
+                v2 = np.array([cp1[0], cp1[1], c1.elevation])
+                v3 = np.array([cp2[0], cp2[1], c2.elevation])
                 normal = np.cross(v2 - v1, v3 - v1)
                 a, b, c = normal
                 d = np.dot(normal, v3)
 
                 # calculate elevation for all points in polygon
-                poly = Poly([center.point, c1.point, c2.point])
+                poly = Poly([center.point, cp1, cp2])
                 minx, miny, maxx, maxy = poly.bounds
 
                 for x in np.arange(minx, maxx, step):
                     for y in np.arange(miny, maxy, step):
-                        if poly.contains(Point(x, y)):
+                        if in_triange((x, y), v1, cp1, cp2):
                             # calculate elevation and convert to pixel value
                             z = (a * x + b * y - d) / -c
                             # get pixel coordinates from our coordinates(0-1)
@@ -205,3 +226,10 @@ class GeoTiffExporter(object):
         shaded = np.sin(altituderad) * np.sin(slope) + np.cos(altituderad) * np.cos(slope) \
             * np.cos(azimuthrad - aspect)
         return 255 * (shaded + 1) / 2
+
+
+def in_triange(pt, v1, v2, v3):
+    b1 = ((pt[0] - v2[0]) * (v1[1] - v2[1]) - (v1[0] - v2[0]) * (pt[1] - v2[1])) <= 0
+    b2 = ((pt[0] - v3[0]) * (v2[1] - v3[1]) - (v2[0] - v3[0]) * (pt[1] - v3[1])) <= 0
+    b3 = ((pt[0] - v1[0]) * (v3[1] - v1[1]) - (v3[0] - v1[0]) * (pt[1] - v1[1])) <= 0
+    return (b1 == b2) and (b2 == b3)
