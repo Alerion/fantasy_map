@@ -1,3 +1,5 @@
+import numpy as np
+
 from .graph import Center, Edge, Corner
 from .voronoi import voronoi_finite_polygons
 
@@ -78,3 +80,34 @@ class VoronoiGraph(object):
         map_obj.centers = centers.values()
         map_obj.edges = edges.values()
         map_obj.corners = corners.values()
+
+    def imporove_corners(self, map_obj):
+        """
+        Although Lloyd relaxation improves the uniformity of polygon
+        sizes, it doesn't help with the edge lengths. Short edges can
+        be bad for some games, and lead to weird artifacts on
+        rivers. We can easily lengthen short edges by moving the
+        corners, but **we lose the Voronoi property**.  The corners are
+        moved to the average of the polygon centers around them. Short
+        edges become longer. Long edges tend to become shorter. The
+        polygons tend to be more uniform after this step.
+        """
+        new_corners = []
+
+        for corner in map_obj.corners:
+            if corner.border:
+                new_corners.append(corner.point)
+            else:
+                new_corners.append(
+                    np.mean(np.array([c.point for c in corner.touches]), axis=0)
+                )
+
+        for i, corner in enumerate(map_obj.corners):
+            corner.point = new_corners[i]
+
+        # fix edges' midpoint
+        for edge in map_obj.edges:
+            edge.midpoint = [
+                (edge.corners[0].point[0] + edge.corners[1].point[0]) / 2,
+                (edge.corners[0].point[1] + edge.corners[1].point[1]) / 2,
+            ]

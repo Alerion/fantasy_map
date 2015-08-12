@@ -1,6 +1,7 @@
 from __future__ import division
 # TODO: Add generator that considers lat/long (distance to North and South poles).
 
+
 class Moisture(object):
 
     def generate(self, map_obj):

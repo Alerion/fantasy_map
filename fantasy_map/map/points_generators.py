@@ -24,6 +24,7 @@ class RelaxedPoints(object):
     def generate(self, map_obj):
         points = np.random.random((self.points_number, 2))
 
+        # make points less "random"
         for _ in range(self.lloyd_iterations):
             regions = voronoi_finite_polygons(points, bbox=map_obj.bbox)
             points = []

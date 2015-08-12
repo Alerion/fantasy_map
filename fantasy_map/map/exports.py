@@ -222,8 +222,8 @@ class GeoTiffExporter(object):
             for x in xrange(image_data.shape[1]):
                 # large scale gives more frequent noise
                 if image_data[y][x] > 0:
-                    scale = 0.07
-                    level = 0.002 + 0.008 * image_data[y][x]
+                    scale = 0.03
+                    level = 0.004 + 0.004 * image_data[y][x]
 
                     noise = snoise2(x * scale, y * scale, octaves=2, base=seed) * level
                     image_data[y][x] = image_data[y][x] + noise

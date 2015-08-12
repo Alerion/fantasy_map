@@ -40,7 +40,7 @@ class Command(BaseCommand):
         map_obj = Map(seed, [
             points_generators.RelaxedPoints(points_number=points).generate,
             graph_generators.VoronoiGraph().generate,
-            # TODO: add this https://github.com/amitp/mapgen2/blob/master/Map.as#L215
+            graph_generators.VoronoiGraph().imporove_corners,
             land_generators.SimplexIsland().generate,
             elevation_generators.FromCoast().generate,
             river_generators.RandomRiver().generate,
