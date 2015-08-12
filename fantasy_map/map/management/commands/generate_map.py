@@ -22,15 +22,20 @@ class Command(BaseCommand):
     help = 'Generate new map'
 
     def add_arguments(self, parser):
+        parser.add_argument('--max_lat', action="store", dest="max_lat", type=int, default=70)
+        parser.add_argument('--max_lng', action="store", dest="max_lng", type=int, default=70)
         parser.add_argument('--seed', action="store", dest="seed", type=int)
+        parser.add_argument('--points', action="store", dest="points", type=int, default=1000)
+        parser.add_argument(
+            '--heights_map_width', action="store", dest="heights_map_width", type=int, default=1000)
 
-    def handle(self, seed=None, *args, **options):
+    def handle(self, max_lat, max_lng, seed, points, heights_map_width, *args, **options):
         if seed is None:
             seed = int(random.random() * 10000)
         print('seed = %s' % seed)
-        max_lat, max_lng = 70, 70
+
         map_obj = Map(seed, [
-            points_generators.RelaxedPoints(points_number=1000).generate,
+            points_generators.RelaxedPoints(points_number=points).generate,
             graph_generators.VoronoiGraph().generate,
             # TODO: add this https://github.com/amitp/mapgen2/blob/master/Map.as#L215
             land_generators.SimplexIsland().generate,
@@ -38,7 +43,8 @@ class Command(BaseCommand):
             river_generators.RandomRiver().generate,
             biome_generators.Moisture().generate,
             exports.ModelExporter(Biome, max_lat=max_lat, max_lng=max_lng).export,
-            exports.GeoTiffExporter(max_lat=max_lat, max_lng=max_lng).export,
+            exports.GeoTiffExporter(
+                max_lat=max_lat, max_lng=max_lng, width=heights_map_width).export,
             # renderers.BiomeRenderer().render,
         ])
 

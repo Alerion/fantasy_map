@@ -1,32 +1,16 @@
 from __future__ import division
 
-import cProfile
 import math
 import gdal
 import numpy as np
 import osr
 import os
-import pstats
 
 from django.conf import settings
 from django.contrib.gis.geos import Polygon, MultiPolygon
-from scipy.ndimage.filters import gaussian_filter
-from shapely.geometry import Polygon as Poly, Point
-
-# 5624515 function calls in 9.509 seconds
-
-
-def profile(func):
-    """Decorator for run function profile"""
-    def wrapper(*args, **kwargs):
-        profile_filename = func.__name__ + '.prof'
-        profiler = cProfile.Profile()
-        result = profiler.runcall(func, *args, **kwargs)
-        profiler.dump_stats(profile_filename)
-        p = pstats.Stats(profile_filename)
-        p.sort_stats('time').print_stats(10)
-        return result
-    return wrapper
+from noise import snoise2
+from scipy.ndimage.filters import gaussian_filter, median_filter
+from shapely.geometry import Polygon as Poly
 
 
 class ModelExporter(object):
@@ -72,16 +56,16 @@ class ModelExporter(object):
 
 class GeoTiffExporter(object):
 
-    def __init__(self, max_lat, max_lng):
+    def __init__(self, max_lat, max_lng, width=1000):
         self.max_lat = max_lat
         self.max_lng = max_lng
         self.dst_filename = os.path.join(settings.BASE_DIR, 'map.tif')
         self.top_left_point = (-(max_lng / 2), max_lat / 2)
         self.bot_right_point = (max_lng / 2, -(max_lat / 2))
         self.max_height = 500  # elevation will be scaled to this value
-        self.width = 1000
+        self.width = width
 
-    # @profile
+    # @profile  # 5624515 function calls in 9.509 seconds
     def export(self, map_obj):
         # http://www.gdal.org/gdal_tutorial.html
         # http://blambi.blogspot.com/2010/05/making-geo-referenced-images-in-python.html
@@ -102,7 +86,10 @@ class GeoTiffExporter(object):
         geo = [top_left_lng_m, PIXEL_SIZE, 0, top_left_lat_m, 0, -PIXEL_SIZE]
         inv_geo = gdal.InvGeoTransform(geo)[1]
         image_data = self.get_image_data(map_obj, (y_pixels, x_pixels), inv_geo, coord_transform)
-        image_data = gaussian_filter(image_data, sigma=1)
+
+        image_data = median_filter(image_data, (6, 6))
+        # image_data = gaussian_filter(image_data, sigma=1)
+        self.add_noise(image_data, map_obj.seed)
 
         image_data *= self.max_height
         image_data = self.add_hillshade(image_data, 225, 45)
@@ -213,11 +200,11 @@ class GeoTiffExporter(object):
         lng, lat = self.point_to_lnglat(point)
         return self.get_pixel(lng, lat, inv_geo, transform)
 
-    def add_hillshade(self, array, azimuth, angle_altitude):
+    def add_hillshade(self, image_data, azimuth, angle_altitude):
         """
         From here http://geoexamples.blogspot.com/2014/03/shaded-relief-images-using-gdal-python.html
         """
-        x, y = np.gradient(array)
+        x, y = np.gradient(image_data)
         slope = np.pi / 2. - np.arctan(np.sqrt(x * x + y * y))
         aspect = np.arctan2(-x, y)
         azimuthrad = azimuth * np.pi / 180.
@@ -226,6 +213,19 @@ class GeoTiffExporter(object):
         shaded = np.sin(altituderad) * np.sin(slope) + np.cos(altituderad) * np.cos(slope) \
             * np.cos(azimuthrad - aspect)
         return 255 * (shaded + 1) / 2
+
+    def add_noise(self, image_data, seed):
+        for y in xrange(image_data.shape[0]):
+            for x in xrange(image_data.shape[1]):
+                # large scale gives more frequent noise
+                if image_data[y][x] > 0:
+                    scale = 0.07
+                    level = 0.002 + 0.008 * image_data[y][x]
+
+                    noise = snoise2(x * scale, y * scale, octaves=2, base=seed) * level
+                    image_data[y][x] = image_data[y][x] + noise
+                    if image_data[y][x] < 0:
+                        image_data[y][x] = 0
 
 
 def in_triange(pt, v1, v2, v3):

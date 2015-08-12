@@ -11,7 +11,8 @@ class Command(BaseCommand):
     help = 'Generate tiles from Biome model'
 
     def handle(self, *args, **options):
-        map_obj = mapnik.Map(1000, 1000)  # EPSG:4326
+        # TODO: Get size from GeoTiff image
+        map_obj = mapnik.Map(2000, 2000)  # EPSG:4326
         mapnik.load_map(map_obj, stylesheet)
         map_obj.zoom_all()
         mapnik.render_to_file(map_obj, 'world.png', 'png')
