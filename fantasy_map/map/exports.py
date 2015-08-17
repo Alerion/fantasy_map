@@ -1,13 +1,13 @@
 from __future__ import division
 
 import math
-import gdal
 import numpy as np
-import osr
 import os
+from osgeo import gdal
+from osgeo import osr
 
 from django.conf import settings
-from django.contrib.gis.geos import Polygon, MultiPolygon
+from django.contrib.gis.geos import Polygon, MultiPolygon, MultiLineString, LineString
 from noise import snoise2
 from scipy.ndimage.filters import gaussian_filter, median_filter
 from shapely.geometry import Polygon as Poly
@@ -15,12 +15,14 @@ from shapely.geometry import Polygon as Poly
 
 class ModelExporter(object):
 
-    def __init__(self, model, max_lat, max_lng):
+    def __init__(self, model, river_model, max_lat, max_lng):
         self.model = model
+        self.river_model = river_model
         self.max_lat = max_lat
         self.max_lng = max_lng
 
     def export(self, map_obj):
+        # Export biomes
         self.model.objects.all().delete()
         new_objects = []
 
@@ -46,6 +48,22 @@ class ModelExporter(object):
             new_objects.append(obj)
 
         self.model.objects.bulk_create(new_objects)
+
+        # Export rivers
+        self.river_model.objects.all().delete()
+        new_objects = []
+
+        for edge in map_obj.edges:
+            if edge.river:
+                obj = self.river_model()
+                obj.width = edge.river
+                p1 = self.point_to_lnglat(edge.corners[0].point)
+                p2 = self.point_to_lnglat(edge.corners[1].point)
+                obj.geom = MultiLineString(LineString(p1, p2))
+                obj.full_clean()
+                new_objects.append(obj)
+
+        self.river_model.objects.bulk_create(new_objects)
 
     def point_to_lnglat(self, point):
         return (
@@ -126,7 +144,7 @@ class GeoTiffExporter(object):
         for center in map_obj.centers:
             completed += 1
             if completed % 100 == 0:
-                print '%s of %s' % (completed, count)
+                print('%s of %s' % (completed, count))
 
             if center.water:
                 continue
@@ -218,8 +236,8 @@ class GeoTiffExporter(object):
         return 255 * (shaded + 1) / 2
 
     def add_noise(self, image_data, seed):
-        for y in xrange(image_data.shape[0]):
-            for x in xrange(image_data.shape[1]):
+        for y in range(image_data.shape[0]):
+            for x in range(image_data.shape[1]):
                 # large scale gives more frequent noise
                 if image_data[y][x] > 0:
                     scale = 0.03

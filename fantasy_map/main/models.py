@@ -34,6 +34,11 @@ class Biome(models.Model):
     geom = models.MultiPolygonField(srid=4326)
 
 
+class River(models.Model):
+    width = models.PositiveIntegerField()
+    geom = models.MultiLineStringField()
+
+
 class Country(models.Model):
     scalerank = models.IntegerField()
     labelrank = models.IntegerField()

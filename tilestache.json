@@ -10,12 +10,6 @@
                 "url": "http://tile.openstreetmap.org/{Z}/{X}/{Y}.png"
             }
         },
-        "world": {
-            "provider": {
-                "name": "mapnik",
-                "mapfile": "/home/alerion/Workspace/fantasy_map/simple_world_style.xml"
-            }
-        },
         "map": {
             "provider": {
                 "name": "mapnik",

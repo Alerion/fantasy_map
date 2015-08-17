@@ -9,15 +9,23 @@ You can run `make generate_map` and see result in matplotlib chart.
 
 # Installation
 
-Requires Python 2.7.
+Requires Python 3.
 
 Create virtualenv with --system-site-packages(it is problem to install mapnik into virtualenv).
 
-    $ virtualenv-2.7 --system-site-packages env
+    $ virtualenv-3.4 env --system-site-packages
 
 ## Install mapnik
 
 Follow this https://github.com/mapnik/mapnik/wiki/UbuntuInstallation. Tested with mapnik 2.3
+
+## Install TileStache
+
+Install TileStache to Python 2.7:
+
+    $ pip install TileStache
+
+And run from Python 2.7, because it does not support Python 3.
 
 ## Install PostgreSQL
 
@@ -32,7 +40,7 @@ https://docs.djangoproject.com/en/1.8/ref/contrib/gis/install/
 
 ## Install requirements
 
-    $ pip install -r requirements.txt
+    $ pip install -v -r requirements.txt
 
 ## Create database
 

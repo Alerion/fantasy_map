@@ -1,8 +1,8 @@
 django==1.8
 psycopg2
 lxml
-TileStache
 numpy
 scipy
 shapely
 noise
+matplotlib

@@ -3,11 +3,9 @@ For visual debugging.
 """
 from __future__ import division
 
-import gdal
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import osr
 from django.contrib.gis.gdal import GDALRaster
 from matplotlib.patches import Polygon
 from noise import snoise2

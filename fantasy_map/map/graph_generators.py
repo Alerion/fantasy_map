@@ -77,9 +77,9 @@ class VoronoiGraph(object):
                 edge.centers[0].neighbors.append(edge.centers[1])
                 edge.centers[1].neighbors.append(edge.centers[0])
 
-        map_obj.centers = centers.values()
-        map_obj.edges = edges.values()
-        map_obj.corners = corners.values()
+        map_obj.centers = list(centers.values())
+        map_obj.edges = list(edges.values())
+        map_obj.corners = list(corners.values())
 
     def imporove_corners(self, map_obj):
         """

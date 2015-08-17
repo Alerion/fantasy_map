@@ -110,6 +110,33 @@
     </Rule>
   </Style>
 
+  <Style name="rivers">
+    <Rule>
+      <LineSymbolizer stroke="#6ea3f2" stroke-width="3" />
+      <Filter>[width] = 1</Filter>
+    </Rule>
+
+    <Rule>
+      <LineSymbolizer stroke="#6ea3f2" stroke-width="5" />
+      <Filter>[width] = 2</Filter>
+    </Rule>
+
+    <Rule>
+      <LineSymbolizer stroke="#6ea3f2" stroke-width="7" />
+      <Filter>[width] = 3</Filter>
+    </Rule>
+
+    <Rule>
+      <LineSymbolizer stroke="#6ea3f2" stroke-width="9" />
+      <Filter>[width] = 4</Filter>
+    </Rule>
+
+    <Rule>
+      <LineSymbolizer stroke="#6ea3f2" stroke-width="11" />
+      <Filter>[width] = 5</Filter>
+    </Rule>
+  </Style>
+
   <Layer name="world" status="on" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
     <StyleName>biomes</StyleName>
     <Datasource>
@@ -119,6 +146,18 @@
       <Parameter name="password">alerion</Parameter>
       <Parameter name="dbname">fantasy_map</Parameter>
       <Parameter name="table">main_biome</Parameter>
+    </Datasource>
+  </Layer>
+
+  <Layer name="rivers" status="on" srs="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs">
+    <StyleName>rivers</StyleName>
+    <Datasource>
+      <Parameter name="type">postgis</Parameter>
+      <Parameter name="host">localhost</Parameter>
+      <Parameter name="user">alerion</Parameter>
+      <Parameter name="password">alerion</Parameter>
+      <Parameter name="dbname">fantasy_map</Parameter>
+      <Parameter name="table">main_river</Parameter>
     </Datasource>
   </Layer>
 

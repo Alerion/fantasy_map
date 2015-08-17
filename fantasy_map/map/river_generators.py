@@ -3,6 +3,9 @@ import random
 
 class RandomRiver(object):
 
+    def __init__(self, points_part=0.1):
+        self.points_part = points_part
+
     def generate(self, map_obj):
         random.seed(map_obj.seed)
         # calculate Corner.downslope and Corner.downslope_edge
@@ -22,7 +25,8 @@ class RandomRiver(object):
         # Do we really need this?
 
         # generate rivers
-        for _ in range(100):
+        points = int(self.points_part * len(map_obj.points))
+        for _ in range(points):
             corner = random.choice(map_obj.corners)
 
             if corner.ocean or corner.river or corner.elevation < 0.3 or corner.elevation > 0.9 \
