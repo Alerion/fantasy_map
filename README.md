@@ -57,3 +57,9 @@ https://docs.djangoproject.com/en/1.8/ref/contrib/gis/install/
 
     $ ./manage.py migrate
     $ ./manage.py import_map
+
+## Screenshots
+
+![Alt text](/screenshots/map1.png?raw=true "")
+![Alt text](/screenshots/map2.png?raw=true "")
+![Alt text](/screenshots/map3.png?raw=true "")
