@@ -1,10 +1,8 @@
-from __future__ import division
-
 import math
 # TODO: Add some algorithm to have ridges
 
 
-class FromCoast(object):
+class FromCoast:
 
     def generate(self, map_obj):
         # FIXME: Lakes can be not just on 0 elevation, and rivers can flow from lake to ocean

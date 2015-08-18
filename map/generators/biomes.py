@@ -2,7 +2,7 @@ from __future__ import division
 # TODO: Add generator that considers lat/long (distance to North and South poles).
 
 
-class Moisture(object):
+class Moisture:
 
     def generate(self, map_obj):
         # Calculate moisture. Freshwater sources spread moisture: rivers
@@ -21,7 +21,7 @@ class Moisture(object):
             corner = corners_queue.pop(0)
             for neighbour in corner.adjacent:
                 new_moisture = corner.moisture * 0.9
-                if (new_moisture > neighbour.moisture):
+                if new_moisture > neighbour.moisture:
                     neighbour.moisture = new_moisture
                     corners_queue.append(neighbour)
 
@@ -76,7 +76,7 @@ class Moisture(object):
             biome = 'OCEAN'
         elif center.water:
             if elevation < 0.1:
-                # FIXME: fix lake elevation at first, not it is set to 0
+                # FIXME: fix lake elevation at first, now it is set to 0
                 # biome = 'MARSH'
                 biome = 'LAKE'
             elif elevation > 0.8:

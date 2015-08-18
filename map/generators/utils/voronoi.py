@@ -1,6 +1,6 @@
+import numpy as np
 from scipy.spatial import Voronoi
 from shapely.geometry import Polygon
-import numpy as np
 
 
 def voronoi_finite_polygons(points, radius=None, bbox=None):

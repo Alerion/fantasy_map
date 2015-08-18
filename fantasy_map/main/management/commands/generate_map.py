@@ -10,11 +10,8 @@ import random
 
 from django.core.management.base import BaseCommand
 
-from fantasy_map.map import (
-    graph_generators, points_generators, renderers, land_generators, elevation_generators,
-    river_generators, biome_generators, exports
-)
-from fantasy_map.map.map import Map
+from map import generators, exports, renderers
+from map.map import Map
 from fantasy_map.main.models import Biome, River
 
 
@@ -29,7 +26,8 @@ class Command(BaseCommand):
         parser.add_argument(
             '--hill_noise', action="store", dest="hill_noise", type=bool, default=False)
         parser.add_argument(
-            '--heights_map_width', action="store", dest="heights_map_width", type=int, default=1000)
+            '--heights_map_width', action="store", dest="heights_map_width", type=int,
+            default=1000)
 
     def handle(self, max_lat, max_lng, seed, points, hill_noise, heights_map_width,
                *args, **options):
@@ -38,13 +36,13 @@ class Command(BaseCommand):
         print('seed = %s' % seed)
 
         map_obj = Map(seed, [
-            points_generators.RelaxedPoints(points_number=points).generate,
-            graph_generators.VoronoiGraph().generate,
-            graph_generators.VoronoiGraph().imporove_corners,
-            land_generators.SimplexIsland().generate,
-            elevation_generators.FromCoast().generate,
-            river_generators.RandomRiver().generate,
-            biome_generators.Moisture().generate,
+            generators.points.RelaxedPoints(points_number=points).generate,
+            generators.graph.VoronoiGraph().generate,
+            generators.graph.VoronoiGraph().imporove_corners,
+            generators.land.SimplexIsland().generate,
+            generators.elevation.FromCoast().generate,
+            generators.rivers.RandomRiver().generate,
+            generators.biomes.Moisture().generate,
             exports.ModelExporter(Biome, River, max_lat=max_lat, max_lng=max_lng).export,
             exports.GeoTiffExporter(max_lat, max_lng, heights_map_width, hill_noise).export,
             # renderers.BiomeRenderer().render,

@@ -6,7 +6,7 @@ from noise import snoise2
 LAKE_THRESHOLD = 0.35  # 0 to 1, fraction of water corners for water polygon
 
 
-class SimplexIsland(object):
+class SimplexIsland:
     """
     Generate lands with Simplex noise.
     """

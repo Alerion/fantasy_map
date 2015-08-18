@@ -1,9 +1,9 @@
 import numpy as np
 
-from .voronoi import voronoi_finite_polygons
+from .utils.voronoi import voronoi_finite_polygons
 
 
-class RandomPoints(object):
+class RandomPoints:
 
     def __init__(self, points_number):
         self.points_number = points_number
@@ -12,7 +12,7 @@ class RandomPoints(object):
         map_obj.points = np.random.random((self.points_number, 2))
 
 
-class RelaxedPoints(object):
+class RelaxedPoints:
     """
     Improve the random set of points with Lloyd Relaxation
     """

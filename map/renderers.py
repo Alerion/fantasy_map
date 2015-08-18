@@ -1,18 +1,12 @@
 """
 For visual debugging.
 """
-from __future__ import division
-
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from django.contrib.gis.gdal import GDALRaster
 from matplotlib.patches import Polygon
-from noise import snoise2
-from shapely.geometry import Polygon as Poly, Point
 
 
-class MatplotRenderer(object):
+class MatplotRenderer:
 
     def __init__(self, verbose=False):
         self.verbose = verbose

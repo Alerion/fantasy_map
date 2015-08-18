@@ -1,7 +1,7 @@
 import numpy as np
 
-from .graph import Center, Edge, Corner
-from .voronoi import voronoi_finite_polygons
+from ..map import Center, Edge, Corner
+from .utils.voronoi import voronoi_finite_polygons
 
 
 def key(p1, p2=None):
@@ -10,7 +10,7 @@ def key(p1, p2=None):
     return tuple(sorted([tuple(p1), tuple(p2)]))
 
 
-class VoronoiGraph(object):
+class VoronoiGraph:
 
     def generate(self, map_obj):
         points = map_obj.points

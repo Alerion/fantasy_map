@@ -1,0 +1,33 @@
+{
+    "@python": 3,
+    "linters": {
+        "eslint": {
+            "@disable": false,
+            "args": [],
+            "excludes": []
+        },
+        "pep8": {
+            "@disable": false,
+            "args": [],
+            "excludes": [],
+            "ignore": "",
+            "max-line-length": 99,
+            "select": ""
+        },
+        "pyflakes": {
+            "@disable": false,
+            "args": [],
+            "excludes": []
+        },
+        "pylint": {
+            "@disable": false,
+            "args": [],
+            "disable": "C0111,R0201,F0401,W0613,R0913,R0902,R0903,R0912,C0103",
+            "enable": "",
+            "excludes": [],
+            "paths": [],
+            "rcfile": "",
+            "show-codes": true
+        }
+    }
+}

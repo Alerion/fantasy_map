@@ -1,5 +1,3 @@
-from __future__ import division
-
 import math
 import numpy as np
 import os
@@ -9,11 +7,11 @@ from osgeo import osr
 from django.conf import settings
 from django.contrib.gis.geos import Polygon, MultiPolygon, MultiLineString, LineString
 from noise import snoise2
-from scipy.ndimage.filters import gaussian_filter, median_filter
+from scipy.ndimage.filters import median_filter
 from shapely.geometry import Polygon as Poly
 
 
-class ModelExporter(object):
+class ModelExporter:
 
     def __init__(self, model, river_model, max_lat, max_lng):
         self.model = model
@@ -97,12 +95,12 @@ class GeoTiffExporter(object):
 
         # image size
         x_pixels = self.width
-        PIXEL_SIZE = abs(top_left_lng_m - bot_right_lng_m) / x_pixels
-        y_pixels = int(abs(bot_right_lat_m - top_left_lat_m) / PIXEL_SIZE) + 1
+        pixel_size = abs(top_left_lng_m - bot_right_lng_m) / x_pixels
+        y_pixels = int(abs(bot_right_lat_m - top_left_lat_m) / pixel_size) + 1
         x_pixels += 1
 
         # pixel/coords transform and inverse transform
-        geo = [top_left_lng_m, PIXEL_SIZE, 0, top_left_lat_m, 0, -PIXEL_SIZE]
+        geo = [top_left_lng_m, pixel_size, 0, top_left_lat_m, 0, -pixel_size]
         inv_geo = gdal.InvGeoTransform(geo)[1]
         image_data = self.get_image_data(map_obj, (y_pixels, x_pixels), inv_geo, coord_transform)
 

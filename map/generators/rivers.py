@@ -1,7 +1,7 @@
 import random
 
 
-class RandomRiver(object):
+class RandomRiver:
 
     def __init__(self, points_part=0.1):
         self.points_part = points_part
