@@ -20,12 +20,15 @@ class ModelExporter:
         self.max_lng = max_lng
 
     def export(self, map_obj):
+        print('Export data to DB')
         # Export biomes
         self.model.objects.all().delete()
         new_objects = []
+        print('Save biomes')
 
         for center in map_obj.centers:
             obj = self.model()
+            center.model = obj
             obj.biome = center.biome
             obj.water = center.water
             obj.coast = center.coast
@@ -33,6 +36,7 @@ class ModelExporter:
             obj.elevation = center.elevation
             obj.moisture = center.moisture
             obj.lng, obj.lat = self.point_to_lnglat(center.point)
+            obj.river = any(edge.river for edge in center.borders)
 
             coords = []
             for corner in center.corners:
@@ -43,11 +47,23 @@ class ModelExporter:
 
             obj.geom = MultiPolygon([Polygon(coords)])
             obj.full_clean()
+            obj.save()
             new_objects.append(obj)
 
-        self.model.objects.bulk_create(new_objects)
+        # FIXME: Use bulk_create and change neighbors saving
+        # self.model.objects.bulk_create(new_objects)
+
+        # save neighbors
+        print('Save biomes neighbors')
+        checked = []
+        for center in map_obj.centers:
+            checked.append(center)
+            for neighbour in center.neighbors:
+                if neighbour not in checked:
+                    center.model.neighbors.add(neighbour.model)
 
         # Export rivers
+        print('Save rivers')
         self.river_model.objects.all().delete()
         new_objects = []
 

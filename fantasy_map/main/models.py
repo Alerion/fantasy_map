@@ -31,7 +31,12 @@ class Biome(models.Model):
     lng = models.FloatField()
     elevation = models.FloatField()
     moisture = models.FloatField()
+    river = models.BooleanField()
+    neighbors = models.ManyToManyField('self')
     geom = models.MultiPolygonField(srid=4326)
+
+    def __str__(self):
+        return str(self.pk)
 
 
 class River(models.Model):

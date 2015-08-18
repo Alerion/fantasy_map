@@ -66,6 +66,9 @@ class Center:
         self.moisture = 0  # 0.0 - 1.0
         self.biome = None
 
+        # for export
+        self.model = None
+
     @property
     def biome_color(self):
         return BIOME_COLORS[self.biome]
