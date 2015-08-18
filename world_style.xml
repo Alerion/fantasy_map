@@ -1,5 +1,109 @@
 <Map background-color="#c3d4ed" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
 
+  <Style name="biomes_textured">
+    <Rule>
+      <PolygonSymbolizer fill="#abceff"/>
+      <LineSymbolizer stroke="#abceff" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[biome] = 'OCEAN'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/TEMPERATE_RAIN_FOREST.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'TEMPERATE_RAIN_FOREST'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/TEMPERATE_DESERT.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'TEMPERATE_DESERT'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/SNOW.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'SNOW'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/SUBTROPICAL_DESERT.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'SUBTROPICAL_DESERT'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/TEMPERATE_DECIDUOUS_FOREST.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'TEMPERATE_DECIDUOUS_FOREST'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/TAIGA.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'TAIGA'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/TAIGA.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'TROPICAL_RAIN_FOREST'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonSymbolizer fill="#abceff" />
+      <LineSymbolizer stroke="#abceff" stroke-width="1"  stroke-linejoin="round"/>
+      <Filter>[biome] = 'LAKE'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/BARE.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'BARE'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/TUNDRA.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'TUNDRA'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/GRASSLAND.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'GRASSLAND'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/TROPICAL_SEASONAL_FOREST.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'TROPICAL_SEASONAL_FOREST'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/SHRUBLAND.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'SHRUBLAND'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/BEACH.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'BEACH'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/SCORCHED.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'SCORCHED'</Filter>
+    </Rule>
+
+    <Rule>
+      <PolygonPatternSymbolizer file="./tiles/MARSH.png"/>
+      <LineSymbolizer stroke-width="0"/>
+      <Filter>[biome] = 'MARSH'</Filter>
+    </Rule>
+  </Style>
+
   <Style name="biomes">
     <Rule>
       <PolygonSymbolizer fill="#abceff"/>
