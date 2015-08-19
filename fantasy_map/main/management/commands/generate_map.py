@@ -43,9 +43,10 @@ class Command(BaseCommand):
             generators.elevation.FromCoast().generate,
             generators.rivers.RandomRiver().generate,
             generators.biomes.Moisture().generate,
-            exports.ModelExporter(Biome, River, max_lat=max_lat, max_lng=max_lng).export,
-            exports.GeoTiffExporter(max_lat, max_lng, heights_map_width, hill_noise).export,
-            # renderers.BiomeRenderer().render,
+            generators.regions.HexGrid().generate,
+            # exports.ModelExporter(Biome, River, max_lat=max_lat, max_lng=max_lng).export,
+            # exports.GeoTiffExporter(max_lat, max_lng, heights_map_width, hill_noise).export,
+            # renderers.RegionRenderer().render,
         ])
 
         map_obj.generate()
