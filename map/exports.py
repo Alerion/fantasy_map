@@ -11,6 +11,8 @@ from scipy.ndimage.filters import median_filter
 from shapely.geometry import Polygon as Poly
 from shapely.ops import cascaded_union
 
+from .name_generator import generate as generate_name
+
 
 class ModelExporter:
 
@@ -89,7 +91,7 @@ class ModelExporter:
 
         for region in map_obj.regions:
             obj = self.region_model()
-            obj.name = str(id(region))
+            obj.name = generate_name()
 
             polygons = [center.shapely_object for center in region.centers]
             region_poly = cascaded_union(polygons)
@@ -121,7 +123,7 @@ class ModelExporter:
             obj = self.city_model()
             obj.biome = capital.model
             obj.capital = True
-            obj.name = str(id(capital))
+            obj.name = generate_name()
             obj.region = region.model
             obj.coords = Point(*self.point_to_lnglat(capital.point))
             obj.full_clean()
