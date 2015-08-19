@@ -226,7 +226,11 @@ class RegionRenderer(MatplotRenderer):
                 self.ax.add_patch(p)
             else:
                 if center.region not in region_colors:
-                    region_colors[center.region] = (random(), random(), random())
+                    region_colors[center.region] = (
+                        max(0.2, random()),
+                        max(0.2, random()),
+                        max(0.2, random())
+                    )
 
                 if center.region in regions:
                     regions[center.region] += 1
@@ -235,6 +239,10 @@ class RegionRenderer(MatplotRenderer):
 
                 p = Polygon([c.point for c in center.corners], color=region_colors[center.region])
                 self.ax.add_patch(p)
+
+        for region in map_obj.regions:
+            point = region.capital.point
+            self.ax.plot([point[0]], [point[1]], 'o', markerfacecolor='#000000')
 
         self.draw_reivers(map_obj)
 

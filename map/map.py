@@ -1,6 +1,7 @@
 """
 Based on http://www-cs-students.stanford.edu/~amitp/game-programming/grids/#relationships
 """
+import math
 import numpy as np
 
 
@@ -31,19 +32,42 @@ class Map:
 
 class Region:
 
-    def __init__(self):
+    def __init__(self, capital):
+        self.capital = capital
         self.centers = []
+        self.add_center(capital)
+
+    def add_center(self, center):
+        assert not center.water
+        assert center.region is None
+        center.region = self
+        self.centers.append(center)
 
     @property
     def free_neighbors(self):
-        neighbor_centers = []
+        free_neighbors = {}
+        cx = self.capital.point[0]
+        cy = self.capital.point[1]
 
         for center in self.centers:
             for neighbor in center.neighbors:
-                if not neighbor.region and not neighbor.water:
-                    neighbor_centers.append(neighbor)
+                if neighbor.region is not None or neighbor.water:
+                    continue
 
-        return neighbor_centers
+                dist_to_cap = math.hypot(cx - neighbor.point[0], cy - neighbor.point[1])
+                weight = (1 - dist_to_cap) ** 100
+
+                # border = center.get_border_with_neighbor(neighbor)
+                # if border.river >= 2:
+                #     weight /= border.river
+
+                if weight < 0:
+                    weight = 0
+
+                if neighbor not in free_neighbors or free_neighbors[neighbor] < weight:
+                    free_neighbors[neighbor] = weight
+
+        return free_neighbors
 
 
 BIOME_COLORS = {
@@ -91,6 +115,13 @@ class Center:
     @property
     def biome_color(self):
         return BIOME_COLORS[self.biome]
+
+    def get_border_with_neighbor(self, neighbor):
+        assert neighbor in self.neighbors
+
+        for edge in self.borders:
+            if neighbor in edge.centers:
+                return edge
 
 
 class Corner:
