@@ -22,5 +22,7 @@ from fantasy_map.main import views
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="main/index.html")),
     url(r'^biomes_data.json$', views.biomes_data, name="biomes_data"),
+    url(r'^regions_data.json$', views.regions_data, name="regions_data"),
+    url(r'^cities_data.json$', views.cities_data, name="cities_data"),
     url(r'^admin/', include(admin.site.urls)),
 ]

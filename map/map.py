@@ -4,6 +4,8 @@ Based on http://www-cs-students.stanford.edu/~amitp/game-programming/grids/#rela
 import math
 import numpy as np
 
+from shapely.geometry import Polygon
+
 
 class Map:
 
@@ -33,9 +35,12 @@ class Map:
 class Region:
 
     def __init__(self, capital):
-        self.capital = capital
+        self.capital = capital  # Center with a capital
         self.centers = []
         self.add_center(capital)
+
+        # for export
+        self.model = None
 
     def add_center(self, center):
         assert not center.water
@@ -68,6 +73,16 @@ class Region:
                     free_neighbors[neighbor] = weight
 
         return free_neighbors
+
+    @property
+    def neighboir_regions(self):
+        regions = []
+        for center in self.centers:
+            for neighbor in center.neighbors:
+                if neighbor.region and neighbor.region not in regions:
+                    regions.append(neighbor.region)
+
+        return regions
 
 
 BIOME_COLORS = {
@@ -122,6 +137,10 @@ class Center:
         for edge in self.borders:
             if neighbor in edge.centers:
                 return edge
+
+    @property
+    def shapely_object(self):
+        return Polygon([corner.point for corner in self.corners])
 
 
 class Corner:

@@ -5,16 +5,19 @@ from osgeo import gdal
 from osgeo import osr
 
 from django.conf import settings
-from django.contrib.gis.geos import Polygon, MultiPolygon, MultiLineString, LineString
+from django.contrib.gis.geos import Polygon, MultiPolygon, MultiLineString, LineString, Point
 from noise import snoise2
 from scipy.ndimage.filters import median_filter
 from shapely.geometry import Polygon as Poly
+from shapely.ops import cascaded_union
 
 
 class ModelExporter:
 
-    def __init__(self, model, river_model, max_lat, max_lng):
-        self.model = model
+    def __init__(self, biome_model, river_model, region_model, city_model, max_lat, max_lng):
+        self.biome_model = biome_model
+        self.city_model = city_model
+        self.region_model = region_model
         self.river_model = river_model
         self.max_lat = max_lat
         self.max_lng = max_lng
@@ -22,12 +25,12 @@ class ModelExporter:
     def export(self, map_obj):
         print('Export data to DB')
         # Export biomes
-        self.model.objects.all().delete()
+        self.biome_model.objects.all().delete()
         new_objects = []
         print('Save biomes')
 
         for center in map_obj.centers:
-            obj = self.model()
+            obj = self.biome_model()
             center.model = obj
             obj.biome = center.biome
             obj.water = center.water
@@ -35,14 +38,14 @@ class ModelExporter:
             obj.border = center.border
             obj.elevation = center.elevation
             obj.moisture = center.moisture
-            obj.lng, obj.lat = self.point_to_lnglat(center.point)
+            obj.center = Point(*self.point_to_lnglat(center.point))
             obj.river = any(edge.river for edge in center.borders)
 
             coords = []
             for corner in center.corners:
                 coords.append(self.point_to_lnglat(corner.point))
             # Sort coordinates. Should be sorted already, but lets check once more.
-            coords.sort(key=lambda p: math.atan2(p[1] - obj.lat, p[0] - obj.lng))
+            coords.sort(key=lambda p: math.atan2(p[1] - obj.center.y, p[0] - obj.center.x))
             coords.append(coords[0])
 
             obj.geom = MultiPolygon([Polygon(coords)])
@@ -78,6 +81,53 @@ class ModelExporter:
                 new_objects.append(obj)
 
         self.river_model.objects.bulk_create(new_objects)
+
+        # Export regions
+        print('Save regions')
+        self.region_model.objects.all().delete()
+        # new_objects = []
+
+        for region in map_obj.regions:
+            obj = self.region_model()
+            obj.name = str(id(region))
+
+            polygons = [center.shapely_object for center in region.centers]
+            region_poly = cascaded_union(polygons)
+            coords = [self.point_to_lnglat(point) for point in region_poly.exterior.coords]
+            obj.geom = MultiPolygon([Polygon(coords)])
+
+            obj.full_clean()
+            obj.save()
+            region.model = obj
+            # new_objects.append(obj)
+
+        # self.region_model.objects.bulk_create(new_objects)
+
+        # Save region neighbors
+        print('Save regions neighbors')
+        checked = []
+        for region in map_obj.regions:
+            for neighbour in region.neighboir_regions:
+                if neighbour not in checked:
+                    region.model.neighbors.add(neighbour.model)
+
+        # Export cities
+        print('Save cities')
+        self.city_model.objects.all().delete()
+        new_objects = []
+
+        for region in map_obj.regions:
+            capital = region.capital
+            obj = self.city_model()
+            obj.biome = capital.model
+            obj.capital = True
+            obj.name = str(id(capital))
+            obj.region = region.model
+            obj.coords = Point(*self.point_to_lnglat(capital.point))
+            obj.full_clean()
+            new_objects.append(obj)
+
+        self.city_model.objects.bulk_create(new_objects)
 
     def point_to_lnglat(self, point):
         return (

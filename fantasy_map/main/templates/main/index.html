@@ -10,15 +10,11 @@
 <body>
     <div id="map" style="width: 1200px; height: 900px"></div>
     <script>
-        var biomesURL = '{% url "biomes_data" %}'
+        var regionsURL = '{% url "regions_data" %}'
+        var citiesURL = '{% url "cities_data" %}'
         var map = L.map('map').setView([0, 0], 4);
         L.tileLayer('http://127.0.0.1:8080/map/{z}/{x}/{y}.png').addTo(map);
 
-        var myStyle = {
-            "color": "#888",
-            "weight": 0,
-            "opacity": 0.1
-        };
 
 /*        L.marker([-5, -5]).addTo(map)
             .bindPopup('Leaflet.js marker.')
@@ -29,14 +25,40 @@
         L.marker([-30, -30]).addTo(map);
         L.marker([27, -27]).addTo(map);*/
 
-/*        $.getJSON(biomesURL, function(data) {
+        $.getJSON(regionsURL, function(data) {
             L.geoJson(data, {
-                style: myStyle,
                 onEachFeature: function (feature, layer) {
-                    layer.bindPopup(feature.properties.biome, {maxWidth: 200});
+                    layer.bindPopup(feature.properties.name, {maxWidth: 200});
+                },
+                style: function(feature) {
+                    var color;
+                    var r = Math.floor(Math.random() * 255);
+                    var g = Math.floor(Math.random() * 255);
+                    var b = Math.floor(Math.random() * 255);
+                    color= "rgb("+r+" ,"+g+","+ b+")";
+                    return {
+                        "color": color,
+                        "weight": 0.5,
+                        "opacity": 0.8
+                    };
                 }
             }).addTo(map);
-        });*/
+        });
+
+        $.getJSON(citiesURL, function(data) {
+            L.geoJson(data, {
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: 5,
+                        fillColor: "#ff7800",
+                        color: "#000",
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    });
+                }
+            }).addTo(map);
+        });
     </script>
 </body>
 </html>

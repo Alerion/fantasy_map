@@ -63,3 +63,4 @@ https://docs.djangoproject.com/en/1.8/ref/contrib/gis/install/
 ![Alt text](/screenshots/map1.png?raw=true "")
 ![Alt text](/screenshots/map2.png?raw=true "")
 ![Alt text](/screenshots/map3.png?raw=true "")
+![Alt text](/screenshots/map4.png?raw=true "")

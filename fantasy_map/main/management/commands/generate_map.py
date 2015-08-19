@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand
 
 from map import generators, exports, renderers
 from map.map import Map
-from fantasy_map.main.models import Biome, River
+from fantasy_map.main.models import Biome, River, Region, City
 
 
 class Command(BaseCommand):
@@ -44,8 +44,9 @@ class Command(BaseCommand):
             generators.rivers.RandomRiver().generate,
             generators.biomes.Moisture().generate,
             generators.regions.HexGrid().generate,
-            # exports.ModelExporter(Biome, River, max_lat=max_lat, max_lng=max_lng).export,
-            # exports.GeoTiffExporter(max_lat, max_lng, heights_map_width, hill_noise).export,
+            exports.ModelExporter(
+                Biome, River, Region, City, max_lat=max_lat, max_lng=max_lng).export,
+            exports.GeoTiffExporter(max_lat, max_lng, heights_map_width, hill_noise).export,
             # renderers.RegionRenderer().render,
         ])
 

@@ -27,12 +27,11 @@ class Biome(models.Model):
     water = models.BooleanField()
     coast = models.BooleanField()
     border = models.BooleanField()
-    lat = models.FloatField()
-    lng = models.FloatField()
     elevation = models.FloatField()
     moisture = models.FloatField()
     river = models.BooleanField()
     neighbors = models.ManyToManyField('self')
+    center = models.PointField(srid=4326)
     geom = models.MultiPolygonField(srid=4326)
 
     def __str__(self):
@@ -48,7 +47,6 @@ class Region(models.Model):
     geom = models.MultiPolygonField(srid=4326)
     name = models.CharField(max_length=100)
     neighbors = models.ManyToManyField('self')
-    capital = models.OneToOneField('City', related_name='capital_of')
 
     def __str__(self):
         return self.name
@@ -56,10 +54,13 @@ class Region(models.Model):
 
 class City(models.Model):
     biome = models.ForeignKey(Biome)
+    capital = models.BooleanField(default=False)
     name = models.CharField(max_length=100)
     region = models.ForeignKey(Region)
-    lat = models.FloatField()
-    lng = models.FloatField()
+    coords = models.PointField(srid=4326)
+
+    class Meta:
+        unique_together = ('region', 'capital')
 
     def __str__(self):
         return self.name
