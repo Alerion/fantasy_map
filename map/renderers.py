@@ -4,6 +4,8 @@ For visual debugging.
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Polygon
+from random import random
+from pprint import pprint
 
 
 class MatplotRenderer:
@@ -13,6 +15,16 @@ class MatplotRenderer:
         plt.figure(figsize=(12, 12))
         plt.axis([-0.05, 1.05, -0.05, 1.05])
         self.ax = plt.subplot(1, 1, 1)
+
+    def draw_reivers(self, map_obj):
+        for edge in map_obj.edges:
+            if not edge.river:
+                continue
+
+            self.ax.plot(
+                [edge.corners[0].point[0], edge.corners[1].point[0]],
+                [edge.corners[0].point[1], edge.corners[1].point[1]],
+                '-', color='#1b6ee3', linewidth=edge.river)
 
 
 class GraphRenderer(MatplotRenderer):
@@ -142,14 +154,7 @@ class ElevationRenderer(MatplotRenderer):
             self.ax.add_patch(p)
 
         if self.rivers:
-            for edge in map_obj.edges:
-                if not edge.river:
-                    continue
-
-                self.ax.plot(
-                    [edge.corners[0].point[0], edge.corners[1].point[0]],
-                    [edge.corners[0].point[1], edge.corners[1].point[1]],
-                    '-', color='#1b6ee3', linewidth=edge.river)
+            self.draw_reivers(map_obj)
 
         plt.show()
 
@@ -174,14 +179,7 @@ class MoistureRenderer(MatplotRenderer):
             p = Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
 
-        for edge in map_obj.edges:
-            if not edge.river:
-                continue
-
-            self.ax.plot(
-                [edge.corners[0].point[0], edge.corners[1].point[0]],
-                [edge.corners[0].point[1], edge.corners[1].point[1]],
-                '-', color='#1b6ee3', linewidth=edge.river)
+        self.draw_reivers(map_obj)
 
         plt.show()
 
@@ -209,14 +207,36 @@ class BiomeRenderer(MatplotRenderer):
                     poly = [center.point, edge.corners[0].point, edge.corners[1].point]
                     self.ax.add_patch(Polygon(poly, color=color, linewidth=2, linestyle='dotted'))
 
-        for edge in map_obj.edges:
-            if not edge.river:
-                continue
+        self.draw_reivers(map_obj)
 
-            self.ax.plot(
-                [edge.corners[0].point[0], edge.corners[1].point[0]],
-                [edge.corners[0].point[1], edge.corners[1].point[1]],
-                '-', color='#1b6ee3', linewidth=edge.river)
+        plt.show()
+
+
+class RegionRenderer(MatplotRenderer):
+
+    def render(self, map_obj):
+        region_colors = {
+            None: '#ffffff'
+        }
+        regions = {}
+
+        for center in map_obj.centers:
+            if center.water:
+                p = Polygon([c.point for c in center.corners], color=center.biome_color)
+                self.ax.add_patch(p)
+            else:
+                if center.region not in region_colors:
+                    region_colors[center.region] = (random(), random(), random())
+
+                if center.region in regions:
+                    regions[center.region] += 1
+                else:
+                    regions[center.region] = 1
+
+                p = Polygon([c.point for c in center.corners], color=region_colors[center.region])
+                self.ax.add_patch(p)
+
+        self.draw_reivers(map_obj)
 
         plt.show()
 

@@ -44,6 +44,27 @@ class River(models.Model):
     geom = models.MultiLineStringField()
 
 
+class Region(models.Model):
+    geom = models.MultiPolygonField(srid=4326)
+    name = models.CharField(max_length=100)
+    neighbors = models.ManyToManyField('self')
+    capital = models.OneToOneField('City', related_name='capital_of')
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    biome = models.ForeignKey(Biome)
+    name = models.CharField(max_length=100)
+    region = models.ForeignKey(Region)
+    lat = models.FloatField()
+    lng = models.FloatField()
+
+    def __str__(self):
+        return self.name
+
+
 class Country(models.Model):
     scalerank = models.IntegerField()
     labelrank = models.IntegerField()

@@ -17,6 +17,7 @@ class Map:
         self.centers = []
         self.edges = []
         self.corners = []
+        self.regions = []
 
     def generate(self):
         # Not sure this is the best pattern
@@ -28,12 +29,29 @@ class Map:
         return [corner for corner in self.corners if not corner.water]
 
 
+class Region:
+
+    def __init__(self):
+        self.centers = []
+
+    @property
+    def free_neighbors(self):
+        neighbor_centers = []
+
+        for center in self.centers:
+            for neighbor in center.neighbors:
+                if not neighbor.region and not neighbor.water:
+                    neighbor_centers.append(neighbor)
+
+        return neighbor_centers
+
+
 BIOME_COLORS = {
     'BARE': '#bbbbbb',
     'BEACH': '#e9ddc7',
     'GRASSLAND': '#c4d4aa',
     'ICE': '#f0f0f0',
-    'LAKE': '#1b6ee3',
+    'LAKE': '#96bff9',
     'MARSH': '#666666',
     'OCEAN': '#abceff',
     'SCORCHED': '#999999',
@@ -57,6 +75,7 @@ class Center:
         self.neighbors = []  # list of Center
         self.borders = []  # list of Edge
         self.corners = []  # list of Corner
+        self.region = None
 
         self.border = False  # at the edge of the map
         self.water = False  # lake or ocean

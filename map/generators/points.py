@@ -17,7 +17,7 @@ class RelaxedPoints:
     Improve the random set of points with Lloyd Relaxation
     """
 
-    def __init__(self, points_number, lloyd_iterations=2):
+    def __init__(self, points_number, lloyd_iterations=4):
         self.points_number = points_number
         self.lloyd_iterations = lloyd_iterations
 
