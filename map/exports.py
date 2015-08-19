@@ -24,12 +24,67 @@ class ModelExporter:
         self.max_lat = max_lat
         self.max_lng = max_lng
 
+    def biome_pre_save(self, obj, center, map_obj):
+        pass
+
+    def city_pre_save(self, obj, city, map_obj):
+        pass
+
+    def region_pre_save(self, obj, region, map_obj):
+        pass
+
+    def river_pre_save(self, obj, edge, map_obj):
+        pass
+
+    def cleanup_biome(self, map_obj):
+        self.biome_model.objects.all().delete()
+
+    def cleanup_city(self, map_obj):
+        self.city_model.objects.all().delete()
+
+    def cleanup_region(self, map_obj):
+        self.region_model.objects.all().delete()
+
+    def cleanup_river(self, map_obj):
+        self.river_model.objects.all().delete()
+
     def export(self, map_obj):
         print('Export data to DB')
+
+        # Export regions
+        print('Save regions')
+        self.cleanup_region(map_obj)
+        # new_objects = []
+
+        for region in map_obj.regions:
+            obj = self.region_model()
+            obj.name = generate_name()
+
+            polygons = [center.shapely_object for center in region.centers]
+            region_poly = cascaded_union(polygons)
+            coords = [self.point_to_lnglat(point) for point in region_poly.exterior.coords]
+            obj.geom = MultiPolygon([Polygon(coords)])
+            self.region_pre_save(obj, region, map_obj)
+
+            obj.full_clean()
+            obj.save()
+            region.model = obj
+            # new_objects.append(obj)
+
+        # self.region_model.objects.bulk_create(new_objects)
+
+        # Save region neighbors
+        print('Save regions neighbors')
+        checked = []
+        for region in map_obj.regions:
+            for neighbour in region.neighboir_regions:
+                if neighbour not in checked:
+                    region.model.neighbors.add(neighbour.model)
+
         # Export biomes
-        self.biome_model.objects.all().delete()
-        new_objects = []
         print('Save biomes')
+        self.cleanup_biome(map_obj)
+        new_objects = []
 
         for center in map_obj.centers:
             obj = self.biome_model()
@@ -38,10 +93,13 @@ class ModelExporter:
             obj.water = center.water
             obj.coast = center.coast
             obj.border = center.border
+            obj.ocean = center.ocean
             obj.elevation = center.elevation
             obj.moisture = center.moisture
             obj.center = Point(*self.point_to_lnglat(center.point))
             obj.river = any(edge.river for edge in center.borders)
+            if not center.water:
+                obj.region = center.region.model
 
             coords = []
             for corner in center.corners:
@@ -51,6 +109,7 @@ class ModelExporter:
             coords.append(coords[0])
 
             obj.geom = MultiPolygon([Polygon(coords)])
+            self.biome_pre_save(obj, center, map_obj)
             obj.full_clean()
             obj.save()
             new_objects.append(obj)
@@ -69,7 +128,7 @@ class ModelExporter:
 
         # Export rivers
         print('Save rivers')
-        self.river_model.objects.all().delete()
+        self.cleanup_river(map_obj)
         new_objects = []
 
         for edge in map_obj.edges:
@@ -79,43 +138,15 @@ class ModelExporter:
                 p1 = self.point_to_lnglat(edge.corners[0].point)
                 p2 = self.point_to_lnglat(edge.corners[1].point)
                 obj.geom = MultiLineString(LineString(p1, p2))
+                self.river_pre_save(obj, edge, map_obj)
                 obj.full_clean()
                 new_objects.append(obj)
 
         self.river_model.objects.bulk_create(new_objects)
 
-        # Export regions
-        print('Save regions')
-        self.region_model.objects.all().delete()
-        # new_objects = []
-
-        for region in map_obj.regions:
-            obj = self.region_model()
-            obj.name = generate_name()
-
-            polygons = [center.shapely_object for center in region.centers]
-            region_poly = cascaded_union(polygons)
-            coords = [self.point_to_lnglat(point) for point in region_poly.exterior.coords]
-            obj.geom = MultiPolygon([Polygon(coords)])
-
-            obj.full_clean()
-            obj.save()
-            region.model = obj
-            # new_objects.append(obj)
-
-        # self.region_model.objects.bulk_create(new_objects)
-
-        # Save region neighbors
-        print('Save regions neighbors')
-        checked = []
-        for region in map_obj.regions:
-            for neighbour in region.neighboir_regions:
-                if neighbour not in checked:
-                    region.model.neighbors.add(neighbour.model)
-
         # Export cities
         print('Save cities')
-        self.city_model.objects.all().delete()
+        self.cleanup_city(map_obj)
         new_objects = []
 
         for region in map_obj.regions:
@@ -126,6 +157,7 @@ class ModelExporter:
             obj.name = generate_name()
             obj.region = region.model
             obj.coords = Point(*self.point_to_lnglat(capital.point))
+            self.region_pre_save(obj, region, map_obj)
             obj.full_clean()
             new_objects.append(obj)
 
@@ -140,10 +172,13 @@ class ModelExporter:
 
 class GeoTiffExporter(object):
 
-    def __init__(self, max_lat, max_lng, width=1000, hill_noise=True):
+    def __init__(self, max_lat, max_lng, width=1000, hill_noise=True, dst_filename=None):
         self.max_lat = max_lat
         self.max_lng = max_lng
-        self.dst_filename = os.path.join(settings.BASE_DIR, 'map.tif')
+        if not dst_filename:
+            self.dst_filename = os.path.join(settings.BASE_DIR, 'map.tif')
+        else:
+            self.dst_filename = dst_filename
         self.top_left_point = (-(max_lng / 2), max_lat / 2)
         self.bot_right_point = (max_lng / 2, -(max_lat / 2))
         self.max_height = 500  # elevation will be scaled to this value
@@ -194,8 +229,8 @@ class GeoTiffExporter(object):
         dataset.FlushCache()
 
     def get_image_data(self, map_obj, size, inv_geo, coord_transform):
-        cache_file_name = 'height_map_cache/%s_%s_%s.npy' % (map_obj.seed, len(map_obj.points), self.width)
-        cache_file_path = os.path.join(settings.BASE_DIR, cache_file_name)
+        cache_file_name = '%s_%s_%s.npy' % (map_obj.seed, len(map_obj.points), self.width)
+        cache_file_path = os.path.join(settings.HEIGHT_CACHE_DIR, cache_file_name)
 
         try:
             return np.load(cache_file_path)

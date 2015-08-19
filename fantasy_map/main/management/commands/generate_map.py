@@ -4,8 +4,6 @@ Inspired by http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-
 Used:
     - https://stackoverflow.com/questions/20515554/colorize-voronoi-diagram/20678647#20678647
 """
-from __future__ import division
-
 import random
 
 from django.core.management.base import BaseCommand

@@ -24,15 +24,17 @@ BIOMES = (
 
 class Biome(models.Model):
     biome = models.CharField(max_length=50, choices=BIOMES)
-    water = models.BooleanField()
-    coast = models.BooleanField()
     border = models.BooleanField()
+    coast = models.BooleanField()
+    ocean = models.BooleanField()
+    water = models.BooleanField()
     elevation = models.FloatField()
     moisture = models.FloatField()
     river = models.BooleanField()
     neighbors = models.ManyToManyField('self')
     center = models.PointField(srid=4326)
     geom = models.MultiPolygonField(srid=4326)
+    region = models.ForeignKey('Region', blank=True, null=True)
 
     def __str__(self):
         return str(self.pk)
