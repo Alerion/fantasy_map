@@ -1,6 +1,7 @@
 *.pyc
+*.sublime-*
+build/
 env/
 local_settings.py
-*.sublime-*
-world.png
 map.tif
+world.png

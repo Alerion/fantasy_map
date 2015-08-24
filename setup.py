@@ -20,7 +20,7 @@ setup(
     url='https://github.com/Alerion/fantasy_map',
     keywords='Django, GIS',
     include_package_data=True,
-    install_requires=[],
+    install_requires=['fake-factory'],
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',

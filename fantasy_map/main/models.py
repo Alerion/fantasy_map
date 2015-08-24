@@ -61,9 +61,6 @@ class City(models.Model):
     region = models.ForeignKey(Region)
     coords = models.PointField(srid=4326)
 
-    class Meta:
-        unique_together = ('region', 'capital')
-
     def __str__(self):
         return self.name
 

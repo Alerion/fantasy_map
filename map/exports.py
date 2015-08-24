@@ -6,12 +6,11 @@ from osgeo import osr
 
 from django.conf import settings
 from django.contrib.gis.geos import Polygon, MultiPolygon, MultiLineString, LineString, Point
+from faker import Factory
 from noise import snoise2
 from scipy.ndimage.filters import median_filter
 from shapely.geometry import Polygon as Poly
 from shapely.ops import cascaded_union
-
-from .name_generator import generate as generate_name
 
 
 class ModelExporter:
@@ -50,6 +49,7 @@ class ModelExporter:
 
     def export(self, map_obj):
         print('Export data to DB')
+        fake = Factory.create()
 
         # Export regions
         print('Save regions')
@@ -58,7 +58,7 @@ class ModelExporter:
 
         for region in map_obj.regions:
             obj = self.region_model()
-            obj.name = generate_name()
+            obj.name = fake.city()
 
             polygons = [center.shapely_object for center in region.centers]
             region_poly = cascaded_union(polygons)
@@ -150,16 +150,16 @@ class ModelExporter:
         new_objects = []
 
         for region in map_obj.regions:
-            capital = region.capital
-            obj = self.city_model()
-            obj.biome = capital.model
-            obj.capital = True
-            obj.name = generate_name()
-            obj.region = region.model
-            obj.coords = Point(*self.point_to_lnglat(capital.point))
-            self.region_pre_save(obj, region, map_obj)
-            obj.full_clean()
-            new_objects.append(obj)
+            for center in region.centers:
+                obj = self.city_model()
+                obj.biome = center.model
+                obj.capital = (center == region.capital)
+                obj.name = fake.city()
+                obj.region = region.model
+                obj.coords = Point(*self.point_to_lnglat(center.point))
+                self.region_pre_save(obj, region, map_obj)
+                obj.full_clean()
+                new_objects.append(obj)
 
         self.city_model.objects.bulk_create(new_objects)
 
