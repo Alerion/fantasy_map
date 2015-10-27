@@ -29,11 +29,21 @@ class MatplotRenderer:
 
 class GraphRenderer(MatplotRenderer):
 
+    def render_points(self, map_obj):
+        x = [center.point[0] for center in map_obj.centers]
+        y = [center.point[1] for center in map_obj.centers]
+        self.ax.plot(x, y, 'go')
+        plt.show()
+
     def render_centers(self, map_obj):
+        x = [center.point[0] for center in map_obj.centers]
+        y = [center.point[1] for center in map_obj.centers]
+        self.ax.plot(x, y, 'go')
+
         for center in map_obj.centers:
             facecolor = (1, 1, 1)
-            if center.border:
-                facecolor = (0.2, 0.2, 0.8)
+            # if center.border:
+            #     facecolor = (0.2, 0.2, 0.8)
             p = Polygon([c.point for c in center.corners], facecolor=facecolor)
             self.ax.add_patch(p)
 
@@ -203,7 +213,6 @@ class BiomeRenderer(MatplotRenderer):
                         color = interpolate_color(color_low, biome_color, lightning)
                     else:
                         color = interpolate_color(biome_color, color_high, lightning)
-
                     poly = [center.point, edge.corners[0].point, edge.corners[1].point]
                     self.ax.add_patch(Polygon(poly, color=color, linewidth=2, linestyle='dotted'))
 
